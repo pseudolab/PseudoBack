@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
  
 const messages = require('./db/messages');
+const { exception } = require('console');
 
 const app = express();
  
@@ -18,8 +19,19 @@ app.get('/', (req, res) => {
 });
 
 app.get('/messages', (req, res) => {
-    messages.getAll().then((messages) => {
-        res.json(messages);
+    messages.getAll().then((message) => {
+        const fs = require('fs');
+
+        message.map((value,index,array)=>{
+            const filename = value['content'];
+            try{
+                const content = fs.readFileSync(filename).toString();
+                value['content'] = content;
+            } catch(error){
+
+            }
+
+        res.json(message);
     });
 }); 
 

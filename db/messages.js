@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const db = require('./connection');
+const fs = require('fs');
  
 const schema = Joi.object().keys({
     username: Joi.string().alphanum().required(),
@@ -25,7 +26,22 @@ function create(message) {
     const result = schema.validate(message);
     if (result.error == null) {
         console.log('done');
-        message.created = new Date();
+        //print(message);
+        const fileDir =  './content/';
+        const d = new Date();
+        message.created = d;
+
+        /* todo: 향후 username 대신 userid로 변경 필요 */
+        const contents = message.content;
+        filename = message['username'] + d.getFullYear() + ("0" + d.getMonth()+1).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2) ;
+        message.content = fileDir + filename;
+        
+        let stream = fs.createWriteStream(fileDir + filename);
+        stream.once('open', function(fd) {
+            stream.write(contents);
+            stream.end();
+        });
+        
         return messages.insert(message);
     } else {
         console.log('error');
@@ -36,4 +52,4 @@ function create(message) {
 module.exports = {
     create,
     getAll
-};
+};;
