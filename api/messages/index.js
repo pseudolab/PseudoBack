@@ -1,10 +1,22 @@
 const router = require('express').Router();
-const messages = require('@db/messages')
+const messages = require('@db/messages');
 
 router.get('/messages', (req, res) => {
-  messages.getAll().then((messages) => {
-      res.json(messages);
-  });
+  messages.getAll().then((message) => {
+      const fs = require('fs');
+
+      message.map((value,index,array)=>{
+          const filename = value['content'];
+          try{
+              const content = fs.readFileSync(filename).toString();
+              value['content'] = content;
+          } catch(error){
+
+          }
+
+      res.json(message);
+    });
+  })
 }); 
 
 router.post('/messages', (req, res) => {
@@ -17,4 +29,4 @@ router.post('/messages', (req, res) => {
   });
 });
 
-module.exports=router
+module.exports=router;
