@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const messages = require('@db/messages');
 
-router.get('/messages', (req, res) => {
+router.get('/', (req, res) => {
   messages.getAll().then((message) => {
       const fs = require('fs');
 
@@ -19,7 +19,7 @@ router.get('/messages', (req, res) => {
   })
 }); 
 
-router.post('/messages', (req, res) => {
+router.post('/', (req, res) => {
   console.log(req.body);
   messages.create(req.body).then((message) => {
       res.json(message);
