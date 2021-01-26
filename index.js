@@ -14,7 +14,7 @@ app.use(morgan('tiny'));
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use(api)
+app.use('/api', api)
  
 app.get('/', (req, res) => {
     res.json({
