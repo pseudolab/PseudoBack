@@ -2,15 +2,20 @@ const Joi = require('joi');
 const db = require('./connection');
 
 const schema = Joi.object().keys({
-    userId: Joi.number().required(),
+    userid: Joi.number().required(),
     username: Joi.string().alphanum().min(3).max(40).required(),
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
     repeatPassword: Joi.ref('password'),
-    birth: Joi.number().optional(),
-    phone: Joi.number().optional(),
-    email: Joi.string().email().optional(),
-    description: Joi.string().max(300).optional(),
+    userpoint: Joi.number().default(0),
+    userclass: Joi.string().alphanum().default('bronze'),
+    isadmin: Joi.boolean().default(false),
+    birth: Joi.number(),
+    phone: Joi.number(),
+    usermail: Joi.string().email(),
+    description: Joi.string().max(300),
+    numofboard: Joi.number(),
+    numofreply: Joi.number(),
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
