@@ -2,20 +2,20 @@ const Joi = require('joi');
 const db = require('./connection');
 
 const schema = Joi.object().keys({
-    userid: Joi.number().required(),
-    username: Joi.string().alphanum().min(3).max(40).required(),
+    userID: Joi.number().required(),
+    userName: Joi.string().alphanum().min(3).max(40).required(),
     password: Joi.string()
-        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required(),
+        .pattern(new RegExp('^[a-zA-Z0-9]{5,30}$')).required(),
     repeatPassword: Joi.ref('password'),
-    userpoint: Joi.number().default(0),
-    userclass: Joi.string().alphanum().default('bronze'),
-    isadmin: Joi.boolean().default(false),
+    userPoint: Joi.number().default(0),
+    userClass: Joi.string().alphanum().default('bronze'),
+    isAdmin: Joi.boolean().default(false),
     birth: Joi.number(),
     phone: Joi.number(),
-    usermail: Joi.string().email(),
+    userMail: Joi.string().email(),
     description: Joi.string().max(300),
-    numofboard: Joi.number(),
-    numofreply: Joi.number(),
+    numBoard: Joi.number(),
+    numReply: Joi.number(),
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
@@ -29,16 +29,19 @@ function getAll() {
     return users.find();
 }
 
-function get(userId){
-    return users.find({
-        userId
+function get(userID){
+    return users.findOne({
+        userID
     });
+}
+
+function dropAll() {
+    return users.drop();
 }
  
 function create(user) {
-    if (!user.username) user.username = 'Anonymous';
+    if (!user.userName) user.userName = 'Anonymous';
 
-    //const result = Joi.valid(user, schema);
     const result = schema.validate(user);
     if (result.error == null) {
         const d = new Date();
@@ -46,7 +49,7 @@ function create(user) {
         
         return users.insert(user);
     } else {
-        console.log('error');
+        console.error('error');
         return Promise.reject(result.error);
     }
 }
@@ -54,5 +57,6 @@ function create(user) {
 module.exports = {
     create,
     getAll,
-    get
+    get,
+    dropAll
 };
