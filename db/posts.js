@@ -29,11 +29,12 @@ function create(message) {
         //print(message);
         const fileDir =  './content/';
         const d = new Date();
-        message.created = d;
+        const date = d.getFullYear() + ("0" + d.getMonth()+1).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
+        message.created = date;
 
         /* todo: 향후 username 대신 userid로 변경 필요 */
         const contents = message.content;
-        filename = message['username'] + d.getFullYear() + ("0" + d.getMonth()+1).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2) ;
+        filename = message['username'] + date;
         message.content = fileDir + filename;
         
         let stream = fs.createWriteStream(fileDir + filename);
