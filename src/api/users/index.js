@@ -1,19 +1,16 @@
 const router = require('express').Router();
 const db = require('@db/users');
 
-router.get('/', async (req, res) => {
-  const userId=req.body.userId;
+router.get('/', (req, res) => {
+  db.getAll().then((users) => {
+    res.json(users)
+  })
+});
 
-  if(userId){
-    console.log('searchng', userId)
-    const result = await db.get(userId);
-    res.json(result);
-  } else {
-    // test only
-    db.getAll().then((users) => {
-      res.json(users)
-    })
-  }
+router.get('/:userID', async (req, res) => {
+  const userID= Number(req.params.userID);
+  const result = await db.get(userID);
+  res.json(result);
 }); 
 
 router.post('/', (req, res) => {

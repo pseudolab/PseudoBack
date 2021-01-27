@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test --watch ./src --watch ./test",
     "start": "node src/index.js",
     "watch": "nodemon src/index.js --watch src"
   },
@@ -13,6 +13,7 @@
   "dependencies": {
     "@vue/cli": "^4.5.10",
     "body-parser": "^1.19.0",
+    "config": "^3.3.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "joi": "^17.3.0",
@@ -27,6 +28,9 @@
     "@db": "./src/db"
   },
   "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.2.1",
     "nodemon": "^2.0.7"
   }
 }
