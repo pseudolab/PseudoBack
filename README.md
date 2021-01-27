@@ -1,4 +1,4 @@
 # PseudoBack
 
 ## run
-npm index.js
+node app.js

@@ -26,7 +26,7 @@ describe('pseudo-back', ()=>{
 
   describe('users api', ()=>{
     it('post / should create a user', async ()=>{
-      const response = await chai.request(server).post('/api/users').send({
+      const response = await chai.request(server).post('/routes/users').send({
         "userName": "username1",  // TODO: use fixture
         "userID": 12314232323,
         "password": "samplePassword"
@@ -37,12 +37,12 @@ describe('pseudo-back', ()=>{
     })    
 
     it('get / should return users', async ()=>{
-      const response = await chai.request(server).get('/api/users');
+      const response = await chai.request(server).get('/routes/users');
       expect(response.body).to.have.length.gte(1)
     })
 
     it('get /:id should return a user', async ()=>{
-      const response = await chai.request(server).get('/api/users/12314232323');
+      const response = await chai.request(server).get('/routes/users/12314232323');
       console.log(response.body)
       expect(response.body.userID).equals(12314232323)
       // password should be hashed
