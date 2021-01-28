@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const messages = require('../../db/posts');
+const messages = require('@db/posts');
 
 /**
 * BaseUrl : web.js router에 선언한 BaseUrl을 표시. request url을 쉽게 파악하기 위함
