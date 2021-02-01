@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const messages = require('@db/posts');
+const posts = require('@db/posts');
 
 /**
 * BaseUrl : web.js router에 선언한 BaseUrl을 표시. request url을 쉽게 파악하기 위함
@@ -19,10 +19,10 @@ router.use(cors());
 router.use(bodyParser.json());
 
 router.get('/', (req, res) => {
-    messages.getAll().then((message) => {
+    posts.getAll().then((post) => {
         const fs = require('fs');
-
-        message.map((value,index,array)=>{
+        /*
+        post.map((value,index,array)=>{
             const filename = value['content'];
             try{
                 const content = fs.readFileSync(filename).toString();
@@ -30,23 +30,38 @@ router.get('/', (req, res) => {
             } catch(error){
             }
         });
-        res.json(message);
+        */
+        res.json(post);
     });
 });
 
-router.post('/:id', (req, res) => {
-    //console.log(req.body);
-    messages.create(req.body).then((message) => {
+router.get('/:id', (req, res) => {
+    const postID = Number(req.params.id);
+    posts.get(postID).then((post) => {
         const fs = require('fs');
-
-        const filename = message['content'];
+        console.log(post);
+        const filename = post['content'];
         try{
             const content = fs.readFileSync(filename).toString();
-            message['content'] = content;
+            post['content'] = content;
+        } catch(error){
+        }
+        res.json(post);
+    });
+});
+
+router.post('/', (req, res) => {
+    posts.create(req.body).then((post) => {
+        const fs = require('fs');
+
+        const filename = post['content'];
+        try{
+            const content = fs.readFileSync(filename).toString();
+            post['content'] = content;
         } catch(error){
             console.log(error);
         }
-        res.json(message);
+        res.json(post);
     }).catch((error) => {
         res.status(500);
         res.json(error);
