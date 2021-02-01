@@ -1,49 +1,50 @@
 const Joi = require('joi');
 const db = require('./connection');
 const fs = require('fs');
+const counter = require('./counter');
  
 const schema = Joi.object().keys({
     username: Joi.string().alphanum().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
-    imageURL: Joi.string().uri({
-        scheme: [
-            /https?/
-        ]
-    })
 });
  
-const messages = db.get('messages');
+const posts = db.get('posts');
  
 function getAll() {
-    return messages.find();
+    return posts.find();
+}
+
+function get(id) {
+    return posts.findOne({"postID":id});
 }
  
-function create(message) {
-    if (!message.username) message.username = 'Anonymous';
+async function create(post) {
+    if (!post.username) post.username = 'Anonymous';
 
-    //const result = Joi.valid(message, schema);
-    const result = schema.validate(message);
+    const result = schema.validate(post);
     if (result.error == null) {
-        console.log('done');
-        //print(message);
         const fileDir =  './content/';
         const d = new Date();
-        const date = d.getFullYear() + ("0" + d.getMonth()+1).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
-        message.created = date;
+        const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
+        post.created = date;
 
         /* todo: 향후 username 대신 userid로 변경 필요 */
-        const contents = message.content;
-        filename = message['username'] + date;
-        message.content = fileDir + filename;
+        const contents = post.content;
+        filename = post['username'] + date;
+        post.content = fileDir + filename;
         
         let stream = fs.createWriteStream(fileDir + filename);
         stream.once('open', function(fd) {
             stream.write(contents);
             stream.end();
         });
+
+        const count = await counter.getCounter("posts");
+        post.postID = count;
+        console.log("testset" + count);
         
-        return messages.insert(message);
+        return posts.insert(post);
     } else {
         console.log('error');
         return Promise.reject(result.error);
@@ -52,5 +53,6 @@ function create(message) {
  
 module.exports = {
     create,
-    getAll
+    getAll,
+    get
 };;
