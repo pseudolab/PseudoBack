@@ -14,11 +14,13 @@ const counter = db.get('counter');
  
 async function getCounter(name) {
     //let count = await counter.findOne({"name":name});
+    let c;
     let count = await counter.findOne({"name":name});
     if (!count){
-        count = await counter.insert({"name":name, "count":0});
+        count = await counter.insert({"name":name, "count":1});
+    } else {
+        c = count.count+1;
     }
-    const c = count.count+1;
     //console.log(count);
     //console.log(c);
 
