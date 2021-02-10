@@ -73,9 +73,8 @@ router.get('/google/callback',
 
 router.get('/authTest',
   function(req, res) {
-    var user = req.session.user;
+    var user = req.user
     console.log('req')
-    console.log(req.session)
     console.log(req.user)
     console.log(req.cookies)
     console.log(req.signedCookies)

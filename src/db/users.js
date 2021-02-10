@@ -18,7 +18,7 @@ passport.use(new LocalStrategy(
   }
 ));
 
-const schema = Joi.object().keys({
+const baseSchema = Joi.object().keys({
     id: Joi.string().required(),
     userName: Joi.string().alphanum().min(3).max(40).required(),
     password: Joi.string()
@@ -33,18 +33,33 @@ const schema = Joi.object().keys({
     description: Joi.string().max(300),
     numBoard: Joi.number(),
     numReply: Joi.number(),
-    social: {
-      google: Joi.object().keys({
-        displayName: Joi.string(),
-        emails: Joi.string()
-      })
-    },
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
         ]
     })
 });
+const googleEmail = Joi.object().keys({
+  value: Joi.string(),
+  verified: Joi.bool()
+}) 
+const googleProfileSchema = baseSchema.append({
+  displayName: Joi.string(),
+  emails: Joi.array().items(googleEmail),
+  photos: Joi.array(),
+  provider: 'google',
+  _raw: Joi.any(),
+  _json: Joi.any(),
+  userID: Joi.number().unsafe()
+})
+
+const localProfileSchema = baseSchema.append({
+})
+
+const schemas = {
+  google: googleProfileSchema,
+  local: localProfileSchema  
+}
  
 const users = db.get('users');
  
@@ -64,7 +79,13 @@ function dropAll() {
  
 function create(user) {
     if (!user.userName) user.userName = 'Anonymous';
-
+    const socialType = user.provider || 'local'
+    console.info('user socialType: ', socialType)
+    const schema = schemas[socialType]
+    if(socialType==='google'){
+      user.userName = user.userName || user.displayName
+    }
+    
     const result = schema.validate(user);
     if (result.error == null) {
         const d = new Date();
