@@ -1,0 +1,58 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: PseudoBack 
+    url: http://localhost:4000/routes
+info:
+  version: "1.0.0"
+  title: PseudoBack
+  description: >-
+    This is an example of using OAuth2 Application Flow in a specification to
+    describe security to your API.
+security:
+  - application:
+      - read
+      - write
+paths:
+  /auths/authTest:
+    get:
+      summary: >-
+        auth test route. access this route with your browser.
+      responses:
+        '200':
+          description: OK
+  /auths/login:
+    get:
+      summary: >-
+        auth login route. handles user login and redirects to previous url if exists.
+      responses:
+        '302':
+          description: OK
+  /auths/logout:
+    get:
+      summary: >-
+        auth logout route
+      responses:
+        '200':
+          description: OK
+  /auths/google/callback:
+    get:
+      summary: >-
+        the callback route of google oauth login.
+      responses:
+        '302':
+          description: OK
+        '200':
+          description: error
+      
+components:
+  schemas: {}
+  securitySchemes:
+    application:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: 'http://example.com/oauth/token'
+          scopes:
+            write: allows modifying resources
+            read: allows reading resources
