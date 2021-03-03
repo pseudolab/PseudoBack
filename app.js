@@ -15,7 +15,7 @@ const app = express();
 app.use(cookieParser);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({ 
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'nyancat',
     resave: true,
 }));
 // Initialize Passport and restore authentication state, if any, from the
