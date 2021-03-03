@@ -4,6 +4,7 @@ const chai = require('chai')
 const expect = require('chai').expect
 const port = 4000;  // TODO: use config
 const usersDB = require('@db/users');
+const authDB = require('@db/auths')
 
 chai.use(require('chai-http'))
 
@@ -28,11 +29,11 @@ describe('pseudo-back', ()=>{
     it('post / should create a user', async ()=>{
       const response = await chai.request(server).post('/routes/users').send({
         "userName": "username1",  // TODO: use fixture
-        "userID": 12314232323,
+        "userID": 12314232323,  // TODO: use returned userID
         "password": "samplePassword"
       
       });
-      console.log('created', response.body)
+      // console.log('created', response.body)
       expect(response.body).to.exist
     })    
 
@@ -43,10 +44,29 @@ describe('pseudo-back', ()=>{
 
     it('get /:id should return a user', async ()=>{
       const response = await chai.request(server).get('/routes/users/12314232323');
-      console.log(response.body)
+      // console.log(response.body)
       expect(response.body.userID).equals(12314232323)
       // password should be hashed
       expect(response.body.password).not.equal("samplePassword")
+    })
+  })
+
+  describe('auth schema', ()=>{
+    it('should validate properly', async ()=>{
+
+    })
+  })
+
+  describe('auths route', ()=>{
+    it('should authenticate google profile', async ()=>{
+      const response = await chai.request(server).post('/routes/auths/login').send({
+        sendData: 'asdasdasdasd!@#!@#!'
+      });
+      console.log(response.body)
+
+      // expect(response.body.userID).equals(12314232323)
+      // // password should be hashed
+      // expect(response.body.password).not.equal("samplePassword")
     })
   })
 

@@ -50,7 +50,10 @@ const googleProfileSchema = baseSchema.append({
   provider: 'google',
   _raw: Joi.any(),
   _json: Joi.any(),
-  userID: Joi.number().unsafe()
+  userID: Joi.number().unsafe(),
+  refreshToken: Joi.any(),
+  accessToken: Joi.any(),
+   
 })
 
 const localProfileSchema = baseSchema.append({
@@ -73,17 +76,33 @@ function get(userID){
     });
 }
 
+function findByEmail(user){
+  return users.findOne({
+    userMail: user.userMail
+  })
+}
+
 function dropAll() {
     return users.drop();
 }
  
-function create(user) {
+async function create(user) {
     if (!user.userName) user.userName = 'Anonymous';
     const socialType = user.provider || 'local'
     console.info('user socialType: ', socialType)
     const schema = schemas[socialType]
     if(socialType==='google'){
       user.userName = user.userName || user.displayName
+      user.userMail = user.emails[0].value
+    }
+
+    const before = await findByEmail(user)
+    console.debug(before)
+    if(before){
+      console.info('user is not null, not creating')
+      return before
+    } else {
+      console.info('creating new user')
     }
     
     const result = schema.validate(user);
@@ -94,13 +113,11 @@ function create(user) {
         return users.insert(user);
     } else {
         console.error('error');
-        return Promise.reject(result.error);
+        throw result.error;
     }
 }
 
 passport.serializeUser((user,done)=>{
-  console.log('serialize start!')
-  console.log(user)
   user.password='password123'
   user.repeatPassword='password123'
   create(user).then((res)=>{
@@ -114,12 +131,9 @@ passport.serializeUser((user,done)=>{
 })
 
 passport.deserializeUser((id, done)=>{
-  console.log('try desrialize!')
   users.findOne({
     id: id
   }, (err, user)=>{
-    console.log('DESRIALAREUSULT')
-    console.warn(user)
     done(err, user)
   })
 

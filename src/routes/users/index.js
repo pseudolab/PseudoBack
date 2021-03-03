@@ -14,7 +14,6 @@ router.get('/:userID', async (req, res) => {
 }); 
 
 router.post('/', (req, res) => {
-  console.log(req.body);
   db.create(req.body).then((user) => {
       res.json(user);
   }).catch((error) => {

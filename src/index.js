@@ -29,7 +29,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.use('/routes', routes)
 
 app.set('port', process.env.PORT || 4000);

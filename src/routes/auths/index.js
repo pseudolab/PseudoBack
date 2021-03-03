@@ -2,6 +2,7 @@ const router=require('express').Router()
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy
   , GoogleStrategy = require('passport-google-oauth20').Strategy;
+const { requireLogin } = require('../../lib');
 require('dotenv').config()
 
 passport.use(new GoogleStrategy({
@@ -13,22 +14,50 @@ passport.use(new GoogleStrategy({
   },
 
   function(accessToken, refreshToken, profile, done) {
-    console.log('authenticated')
-    console.log(accessToken)
-    console.log(refreshToken)
-    console.log(profile)
+
     profile.userID=Number(profile.id) // make userID
+    profile.refreshToken = refreshToken
+    profile.accessToken = accessToken
     return done(undefined, profile)
   }
   ));
 
+// router.get(`/auth`, (req, res, next) => {
+//   const { returnTo } = req.query
+//   const state = returnTo
+//     ? Buffer.from(JSON.stringify({ returnTo })).toString('base64')
+//     : '/routes/auths/success'
+
+//   const authenticator = passport.authenticate('google', { scope: ['email'], state })
+
+//   authenticator(req, res, next)
+// })
+
+router.get(
+  `/google/callback`,
+  passport.authenticate('google', { failureRedirect: '/-/failure' }),
+  (req, res) => {
+    try {
+      const { state } = req.query
+      const { returnTo } = JSON.parse(Buffer.from(state, 'base64').toString())
+      
+      if (typeof returnTo === 'string' && returnTo.startsWith('/')) {
+        return res.redirect(returnTo)
+      }
+    } catch (e){
+      // just redirect normally below
+      console.error(e)
+      res.json({err: 'login err'})
+      return
+    }
+    res.redirect('/')
+  },
+)
+
 router.get('/login', 
-  passport.authenticate('google', {
-    scope:['email'], failureRedirect: '/routes/auths/failure' }),
+  requireLogin,
   function(req, res) {
-    console.log('req; ')
-    console.log(req)
-    res.redirect('/routes');
+    res.redirect('/routes/auths/success')
   }
 );
 
@@ -36,24 +65,8 @@ router.get('/test', (req,res)=>{
   res.redirect('/routes')
 })
 
-// router.post('/google',
-//   passport.authenticate('google', { scope: ['profile'] })
-//   );
-
-// router.get('/google',
-//   passport.authenticate('google', { scope: ['profile'] }));
-
-// router.get('/google/callback',
-//   passport.authenticate( 'google', {
-//       successRedirect: '/routes/auths/success',
-//       failureRedirect: '/routes/auths/failure'
-// }));
-
 router.get('/success', (req, res)=>{
   console.log('success')
-  // console.info(req)
-  console.log(req.user)
-  console.log(req.session)
   res.sendStatus(200)
 })
 
@@ -61,38 +74,20 @@ router.get('/failure', (req,res)=>{
   res.sendStatus(400)
 })
 
-router.get('/google/callback', 
-  passport.authenticate('google', { failureRedirect: '/routes/auths/login' }),
-  function(req, res) {
-    console.log('success')
-    console.log(req.user)
-    // Successful authentication, redirect home.
-    res.redirect('/routes/auths/success');
-  });
-
+router.get('/logout', function(req, res){
+  req.logout();
+  console.log('logout success')
+  res.redirect('/routes/auths/login')
+});
 
 router.get('/authTest',
+  requireLogin,
   function(req, res) {
     var user = req.user
-    console.log('req')
-    console.log(req.user)
-    console.log(req.cookies)
-    console.log(req.signedCookies)
-    if(!user){
-      res.redirect('/routes/auths/login')
-      return
-    }
-    console.log(req.user)
-    // var account = req.account;
+    console.log('authTest success, user:')
+    console.log(user)
 
-    // // Associate the Twitter account with the logged-in user.
-    // account.userId = user.id;
-    // account.save(function(err) {
-    //   if (err) { return self.error(err); }
-    //   self.redirect('/');
-    // });
-
-    res.sendStatus(201)
+    res.json({user: req.user, cookies: req.cookies, signedCookies: req.signedCookies})
   }
 );
 

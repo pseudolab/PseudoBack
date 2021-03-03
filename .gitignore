@@ -104,3 +104,5 @@ dist
 .tern-port
 
 pseudo.code-workspace
+
+.DS_Store
