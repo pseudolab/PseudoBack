@@ -1,0 +1,352 @@
+swagger: "2.0"
+info:
+  description: "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters."
+  version: "1.0.0"
+  title: "Swagger Petstore"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "petstore.swagger.io"
+basePath: "/v2"
+tags:
+- name: "posts"
+  description: "Everything about your Pets"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "posts/qnas"
+  description: "Access to Petstore orders"
+- name: "profiles"
+  description: "Operations about user"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+- name: "user"
+  description: "Operations about user"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+schemes:
+- "http"
+paths:
+  /posts:
+    post:
+      tags:
+      - "posts"
+      summary: "Add new posts"
+      description: ""
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Pet object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/posts"
+      responses:
+        "200":
+          description: "Success"
+    get:
+      tags:
+      - "posts"
+      summary: "Get posts list"
+      parameters:
+        - in: "query"
+          name: "category"
+          type: "string"
+          description: "category fileter (study name)"
+      responses:
+        "200":
+          description: "Get posts list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/posts"
+  /posts/{postsid}:
+    get:
+      tags:
+      - "posts"
+      summary: "Get specific post"
+      parameters:
+      - name: "postsid"
+        in: "path"
+        description: "The post ID for posts"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Get specific posts"
+          schema:
+            $ref: "#/definitions/posts"
+  /posts/replys:
+    post:
+      tags:
+      - "posts"
+      summary: "Add new reply"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "The post ID for posts"
+        required: true
+        schema:
+          $ref: "#/definitions/replys"
+      responses:
+        "200":
+          description: "Add new reply"
+  /posts/replys/{postsid}:
+    get:
+      tags:
+      - "posts"
+      summary: "Get specific reply"
+      parameters:
+      - name: "postsid"
+        in: "path"
+        description: "The post ID for reply"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Get specific reply"
+          schema:
+            $ref: "#/definitions/replys"
+  /posts/qnas/questions:
+    post:
+      tags:
+      - "posts/qnas"
+      summary: "Add new question"
+      description: ""
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Pet object that needs to be added to the store"
+        required: true
+        schema:
+          $ref: "#/definitions/questions"
+      responses:
+        "200":
+          description: "Success"
+    get:
+      tags:
+      - "posts/qnas"
+      summary: "Get questions reply list"
+      responses:
+        "200":
+          description: "Get questions list"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/questions"
+  /posts/qnas/questions/{postsid}:
+    get:
+      tags:
+      - "posts/qnas"
+      summary: "Get posts reply list"
+      parameters:
+      - name: "postsid"
+        in: "path"
+        description: "The post ID for questions"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Get specific questions"
+          schema:
+            $ref: "#/definitions/questions"
+  /posts/qnas/answers:
+    post:
+      tags:
+      - "posts/qnas"
+      summary: "Add new answer"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "The post ID for answers"
+        required: true
+        schema:
+          $ref: "#/definitions/answers"
+      responses:
+        "200":
+          description: "Add new answer"
+  /posts/qnas/answers/{postsid}:
+    get:
+      tags:
+      - "posts/qnas"
+      summary: "Get posts reply list"
+      parameters:
+      - name: "postsid"
+        in: "path"
+        description: "The post ID for answer"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Get specific answer"
+          schema:
+            $ref: "#/definitions/answers"
+  /profiles/{userid}:
+    get:
+      tags:
+      - "profiles"
+      summary: "Get posts reply list"
+      parameters:
+      - name: "userid"
+        in: "path"
+        description: "The user ID for profile"
+        required: true
+        type: "string"
+      responses:
+        "200":
+          description: "Get specific userid"
+          schema:
+            $ref: "#/definitions/profiles"
+definitions:
+  posts:
+    type: "object"
+    required:
+    - "username"
+    - "subject"
+    - "content"
+    - "keyword"
+    - "category"
+    properties:
+      username:
+        type: "string"
+        example: "testuser"
+      subject:
+        type: "string"
+        example: "testsubject"
+      content:
+        type: "string"
+        example: "testcontent"
+      keyword:
+        type: "array"
+        items:
+          type: "string"
+      cowriter:
+        type: "array"
+        items:
+          type: "string"
+      category:
+        type: "string"
+        description: "pet status in the store"
+        enum:
+        - "available"
+        - "pending"
+        - "sold"
+    xml:
+      name: "posts"
+  replys:
+    type: "object"
+    required:
+    - "username"
+    - "content"
+    properties:
+      username:
+        type: "string"
+        example: "testusername"
+      content:
+        type: "string"
+        example: "testcontent"
+      postID:
+        type: "integer"
+        format: "int32"
+    xml:
+      name: "replys"
+  questions:
+    type: "object"
+    required:
+    - "username"
+    - "subject"
+    - "content"
+    properties:
+      username:
+        type: "string"
+        example: "testusername"
+      subject:
+        type: "string"
+        example: "testsubject"
+      content:
+        type: "string"
+        example: "testcontent"
+    xml:
+      name: "questions"
+  answers:
+    type: "object"
+    required:
+    - "username"
+    - "subject"
+    - "content"
+    - "postID"
+    properties:
+      username:
+        type: "string"
+        example: "testusername"
+      subject:
+        type: "string"
+        example: "testsubject"
+      content:
+        type: "string"
+        example: "testcontent"
+      postID:
+        type: "integer"
+        format: "int32"
+  profiles:
+    type: "object"
+    required:
+    - "userID"
+    - "userName"
+    properties:
+      userID:
+        type: "integer"
+        format: "int32"
+      username:
+        type: "string"
+        example: "testusername"
+      userPoint:
+        type: "string"
+        example: "testsubject"
+      userClass:
+        type: "string"
+        example: "testcontent"
+      isAdmin:
+        type: "boolean"
+      birth:
+        type: "integer"
+        format: "int32"
+      phone:
+        type: "integer"
+        format: "int32"
+      userMail:
+        type: "string"
+        example: "testcontent"
+      description:
+        type: "string"
+        example: "testcontent"
+      numBoard:
+        type: "integer"
+        format: "int32"
+      numReply:
+        type: "integer"
+        format: "int32"
+      profileImageURL:
+        type: "string"
+        example: "testcontent"
+    xml:
+      name: "profiles"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
