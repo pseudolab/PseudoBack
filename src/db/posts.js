@@ -7,14 +7,16 @@ const schema = Joi.object().keys({
     username: Joi.string().alphanum().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
-    keyword: Joi.array().items(Joi.string()),
-    category: Joi.array().items(Joi.string())
+    keyword: Joi.array().items(Joi.string()).required(),
+    cowriter: Joi.array().items(Joi.string()),
+    category: Joi.string().required()
 });
  
 const posts = db.get('posts');
  
-function getAll() {
-    return posts.find();
+function getAll(queryMap) {
+    console.log(queryMap);
+    return posts.find(queryMap);
 }
 
 function get(id) {
