@@ -17,8 +17,12 @@ router.use(cors());
 router.use(bodyParser.json());
 
 router.get('/', (req, res) => {
-    posts.getAll().then((post) => {
-        const fs = require('fs');
+    const category = req.query.category;
+    let queryMap = null
+    if (category != undefined){
+        queryMap = {"category" : category};
+    }
+    posts.getAll(queryMap).then((post) => {
         res.json(post);
     });
 });
