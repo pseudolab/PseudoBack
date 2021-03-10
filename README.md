@@ -1,4 +1,7 @@
 # PseudoBack
 
 ## run
-node app.js
+	> npm run start
+	> npm run test
+	> npm run watch
+

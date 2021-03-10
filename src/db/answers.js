@@ -7,36 +7,29 @@ const schema = Joi.object().keys({
     username: Joi.string().alphanum().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
-    keyword: Joi.array().items(Joi.string()).required(),
-    cowriter: Joi.array().items(Joi.string()),
-    category: Joi.string().required()
+    postID: Joi.number().required(),
 });
  
-const posts = db.get('posts');
+const answers = db.get('answers');
  
-function getAll(queryMap) {
-    console.log(queryMap);
-    return posts.find(queryMap);
-}
-
 function get(id) {
-    return posts.findOne({"postID":id});
+    return answers.find({"postID":id});
 }
  
-async function create(post) {
-    if (!post.username) post.username = 'Anonymous';
+async function create(answer) {
+    if (!answer.username) answer.username = 'Anonymous';
 
-    const result = schema.validate(post);
+    const result = schema.validate(answer);
     if (result.error == null) {
         const fileDir =  './content/';
         const d = new Date();
         const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
-        post.created = date;
+        answer.created = date;
 
         /* todo: 향후 username 대신 userid로 변경 필요 */
-        const contents = post.content;
-        filename = post['username'] + date;
-        post.content = fileDir + filename;
+        const contents = answer.content;
+        filename = answer['username'] + date;
+        answer.content = fileDir + filename;
         
         let stream = fs.createWriteStream(fileDir + filename);
         stream.once('open', function(fd) {
@@ -44,11 +37,11 @@ async function create(post) {
             stream.end();
         });
 
-        const count = await counter.getCounter("posts");
-        post.postID = count;
-        console.log("testset" + count);
+        //const count = await counter.getCounter("answers");
+        //answe.postID = count;
+        //console.log("testset" + count);
         
-        return posts.insert(post);
+        return answers.insert(answer);
     } else {
         console.log('error');
         return Promise.reject(result.error);
@@ -57,6 +50,5 @@ async function create(post) {
  
 module.exports = {
     create,
-    getAll,
     get
 };;
