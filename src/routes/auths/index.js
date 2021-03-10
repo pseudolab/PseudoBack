@@ -22,17 +22,6 @@ passport.use(new GoogleStrategy({
   }
   ));
 
-// router.get(`/auth`, (req, res, next) => {
-//   const { returnTo } = req.query
-//   const state = returnTo
-//     ? Buffer.from(JSON.stringify({ returnTo })).toString('base64')
-//     : '/routes/auths/success'
-
-//   const authenticator = passport.authenticate('google', { scope: ['email'], state })
-
-//   authenticator(req, res, next)
-// })
-
 router.get(
   `/google/callback`,
   passport.authenticate('google', { failureRedirect: '/-/failure' }),
@@ -76,7 +65,7 @@ router.get('/failure', (req,res)=>{
 
 router.get('/logout', function(req, res){
   req.logout();
-  console.log('logout success')
+  console.info('logout success')
   res.redirect('/routes/auths/login')
 });
 
@@ -84,8 +73,8 @@ router.get('/authTest',
   requireLogin,
   function(req, res) {
     var user = req.user
-    console.log('authTest success, user:')
-    console.log(user)
+    console.info('authTest success, user:')
+    console.debug(user)
 
     res.json({user: req.user, cookies: req.cookies, signedCookies: req.signedCookies})
   }
