@@ -13,12 +13,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-
 router.use(morgan('tiny'));
 router.use(cors());
 router.use(bodyParser.json());
 
-router.use('/',postsRouter);
+router.use('/', postsRouter);
 router.use('/replys',replysRouter);
 
 

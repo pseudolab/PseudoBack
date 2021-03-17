@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const db = require('@db/users');
+const { requireLogin } = require('../../lib/middlewares');
 
 router.get('/', (req, res) => {
   db.getAll().then((users) => {
@@ -13,7 +14,7 @@ router.get('/:userID', async (req, res) => {
   res.json(result);
 }); 
 
-router.post('/', (req, res) => {
+router.post('/', requireLogin, (req, res) => {
   db.create(req.body).then((user) => {
       res.json(user);
   }).catch((error) => {

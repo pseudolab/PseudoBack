@@ -10,6 +10,7 @@ const posts = require('@db/posts');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const { requireLogin } = require('../../lib/middlewares');
 
 
 router.use(morgan('tiny'));
@@ -42,7 +43,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', requireLogin, (req, res) => {
     posts.create(req.body).then((post) => {
         const fs = require('fs');
 
