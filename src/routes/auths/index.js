@@ -24,7 +24,7 @@ passport.use(new GoogleStrategy({
 
 router.get(
   `/google/callback`,
-  passport.authenticate('google', { failureRedirect: '/-/failure' }),
+  passport.authenticate('google', { failureRedirect: '../failure' }),
   (req, res) => {
     try {
       const { state } = req.query
