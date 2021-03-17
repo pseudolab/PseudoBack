@@ -60,7 +60,7 @@ router.get('/success', (req, res)=>{
 })
 
 router.get('/failure', (req,res)=>{
-  res.sendStatus(400)
+  res.sendStatus(401) // Unauthorized
 })
 
 router.get('/logout', function(req, res){
