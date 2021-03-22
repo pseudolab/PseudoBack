@@ -14,11 +14,11 @@ const routes = require('./routes');
 const indexRouter = require('./routes/index');
 
 //request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
+app.use(express.json());
 app.use('/', indexRouter);
 
 app.use(morgan('tiny'));
 app.use(cors());
-app.use(bodyParser.json());
 
 app.use('/routes', routes)
 
