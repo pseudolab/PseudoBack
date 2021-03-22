@@ -22,8 +22,8 @@ router.get('/:id', (req, res) => {
     answers.get(postID).then((answer) => {
         const fs = require('fs');
         answer.map((value,index,array)=>{
-            const filename = value['content'];
             try{
+                const filename = value['content'];
                 const content = fs.readFileSync(filename).toString();
                 value['content'] = content;
             } catch(error){
@@ -38,8 +38,8 @@ router.post('/', (req, res) => {
     answers.create(req.body).then((answer) => {
         const fs = require('fs');
 
-        const filename = answer['content'];
         try{
+            const filename = answer['content'];
             const content = fs.readFileSync(filename).toString();
             answer['content'] = content;
         } catch(error){
