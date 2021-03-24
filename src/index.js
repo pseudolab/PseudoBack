@@ -18,13 +18,12 @@ const indexRouter = require('./routes/index');
 
 //request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use('/', indexRouter);
 
 app.use(morgan('tiny'));
 app.use(cors());
 app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(session({ 
     secret: 'keycat cat',
