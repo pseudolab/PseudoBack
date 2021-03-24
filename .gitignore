@@ -106,3 +106,5 @@ dist
 pseudo.code-workspace
 
 .DS_Store
+
+content/*
