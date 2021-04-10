@@ -55,7 +55,6 @@ router.post('/', (req, res) => {
     });
 
     req.on('end', function() {
-        console.log(body);
         const data = querystring.parse(body, 'name="', '"\r\n\r\n');
         let obj = JSON.parse(JSON.stringify(data));
         
@@ -65,7 +64,11 @@ router.post('/', (req, res) => {
                 delete obj[item];
             }
             else{
-                output[item] = obj[item].replace(/\r\n.*/g,'');
+                if(item == 'keyword' || item == 'cowriter'){
+                    output[item] =  obj[item].replace(/\r\n.*/g,'').split(",");
+                } else {
+                    output[item] = obj[item].replace(/\r\n.*/g,'');
+                }
             }
         });
 
