@@ -60,6 +60,35 @@ router.post('/', (req, res) => {
     });
 });
 
+router.delete('/:id', (req, res) => {
+    const postID = Number(req.params.id);
+    const result = posts.remove(postID).then((result) => {
+        if(result['deletedCount'] == 1){
+            res.status(200);
+        } else{
+            //res.status
+        }
+        res.redirect('/');
+    })
+});
+
+router.put('/:id', (req, res) => {
+    posts.create(req.body).then((post) => {
+        const fs = require('fs');
+        
+        try{
+            const filename = post['content'];
+            const content = fs.readFileSync(filename).toString();
+            post['content'] = content;
+        } catch(error){
+            console.log(error);
+        }
+        res.json(post);
+    }).catch((error) => {
+        res.status(500);
+        res.json(error);
+    });
+});
 
 
 module.exports = router;
