@@ -39,10 +39,12 @@ const baseSchema = Joi.object().keys({
         ]
     })
 });
+
 const googleEmail = Joi.object().keys({
   value: Joi.string(),
   verified: Joi.bool()
 }) 
+
 const googleProfileSchema = baseSchema.append({
   displayName: Joi.string(),
   emails: Joi.array().items(googleEmail),
@@ -53,7 +55,6 @@ const googleProfileSchema = baseSchema.append({
   userID: Joi.number().unsafe(),
   refreshToken: Joi.any(),
   accessToken: Joi.any(),
-   
 })
 
 const localProfileSchema = baseSchema.append({
@@ -117,31 +118,30 @@ async function create(user) {
     }
 }
 
-passport.serializeUser((user,done)=>{
-  user.password='password123'
-  user.repeatPassword='password123'
-  create(user).then((res)=>{
-    console.log('SERIALIZE RESULT')
-    console.info(res.id)
-    done(null, user.id)
-  }).catch((err)=>{
-    console.error(err)
-    throw err
-  })
-})
-
-passport.deserializeUser((id, done)=>{
-  users.findOne({
+async function findById(id){
+  return users.findOne({
     id: id
-  }, (err, user)=>{
-    done(err, user)
-  })
+  });
+}
 
-})
+async function findByEmail(email){
+  return users.findOne({
+    userMail: email
+  }) 
+}
+
+async function findByGoogleId(userID){
+  return await users.findOne({
+    userID: userID
+  });
+}
 
 module.exports = {
     create,
     getAll,
     get,
-    dropAll
+    dropAll,
+    findById,
+    findByEmail,
+    findByGoogleId,
 };
