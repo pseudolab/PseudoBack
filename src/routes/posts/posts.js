@@ -4,6 +4,8 @@ const posts = require('@db/posts');
 //const multiparty = require('multiparty');
 const querystring = require('querystring');
 
+const multer = require('multer');
+
 /**
 * BaseUrl : web.js router에 선언한 BaseUrl을 표시. request url을 쉽게 파악하기 위함
 *  : /club
@@ -45,8 +47,36 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
-    
+const multerConfig = {
+    storage: multer.diskStorage({
+    destination: function (req, file, next) {
+        //let text = req.body.message;
+        //let now = Date.now();
+        fs.writeFile(path.join(__dirname, './images/' + file.originalname ), text, console.log);
+        next(null, '/');
+        }
+   })
+  };
+  router.post('/', multer(multerConfig).array('image'),function(req, res){
+      console.log(req.body.username);
+      posts.create(req.body).then((post) => {
+        const fs = require('fs');
+        try{
+            const filename = post['content'];
+            const content = fs.readFileSync(filename).toString();
+            post['content'] = content;
+        } catch(error){
+            console.log(error);
+        }
+        res.json(post);
+    }).catch((error) => {
+        res.status(500);
+        res.json(error);
+    });
+    });
+
+
+router.post('/sss', (req, res) => {
     var body = '';
     req.on('data', function(chunk) { 
 
