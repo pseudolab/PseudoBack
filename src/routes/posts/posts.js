@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const posts = require('@db/posts');
+//const multiparty = require('multiparty');
+const querystring = require('querystring');
+
+const multer = require('multer');
 
 /**
 * BaseUrl : web.js router에 선언한 BaseUrl을 표시. request url을 쉽게 파악하기 위함
@@ -11,10 +15,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-
 router.use(morgan('tiny'));
 router.use(cors());
+router.use (bodyParser.urlencoded ({extended : true})); 
 router.use(bodyParser.json());
+  
 
 router.get('/', (req, res) => {
     const category = req.query.category;
@@ -42,7 +47,80 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+const multerConfig = {
+    storage: multer.diskStorage({
+    destination: function (req, file, next) {
+        //let text = req.body.message;
+        //let now = Date.now();
+        fs.writeFile(path.join(__dirname, './images/' + file.originalname ), text, console.log);
+        next(null, '/');
+        }
+   })
+  };
+  router.post('/', multer(multerConfig).array('image'),function(req, res){
+      console.log(req.body.username);
+      posts.create(req.body).then((post) => {
+        const fs = require('fs');
+        try{
+            const filename = post['content'];
+            const content = fs.readFileSync(filename).toString();
+            post['content'] = content;
+        } catch(error){
+            console.log(error);
+        }
+        res.json(post);
+    }).catch((error) => {
+        res.status(500);
+        res.json(error);
+    });
+    });
+
+
+router.post('/sss', (req, res) => {
+    var body = '';
+    req.on('data', function(chunk) { 
+
+      body += chunk;
+
+    });
+
+    req.on('end', function() {
+        const data = querystring.parse(body, 'name="', '"\r\n\r\n');
+        let obj = JSON.parse(JSON.stringify(data));
+        
+        let output = {};
+        Object.keys(obj).forEach((item) => {
+            if(obj[item] == null || obj[item] == "") {
+                delete obj[item];
+            }
+            else{
+                if(item == 'keyword' || item == 'cowriter'){
+                    output[item] =  obj[item].replace(/\r\n.*/g,'').split(",");
+                } else {
+                    output[item] = obj[item].replace(/\r\n.*/g,'');
+                }
+            }
+        });
+
+        posts.create(output).then((post) => {
+            const fs = require('fs');
+    
+            try{
+                const filename = post['content'];
+                const content = fs.readFileSync(filename).toString();
+                post['content'] = content;
+            } catch(error){
+                console.log(error);
+            }
+            res.json(post);
+        }).catch((error) => {
+            res.status(500);
+            res.json(error);
+        });
+
+    }); 
+    
+    /*
     posts.create(req.body).then((post) => {
         const fs = require('fs');
 
@@ -58,8 +136,38 @@ router.post('/', (req, res) => {
         res.status(500);
         res.json(error);
     });
+    */
 });
 
+router.delete('/:id', (req, res) => {
+    const postID = Number(req.params.id);
+    const result = posts.remove(postID).then((result) => {
+        if(result['deletedCount'] == 1){
+            res.status(200);
+        } else{
+            //res.status
+        }
+        res.redirect('/');
+    })
+});
+
+router.put('/:id', (req, res) => {
+    posts.create(req.body).then((post) => {
+        const fs = require('fs');
+        
+        try{
+            const filename = post['content'];
+            const content = fs.readFileSync(filename).toString();
+            post['content'] = content;
+        } catch(error){
+            console.log(error);
+        }
+        res.json(post);
+    }).catch((error) => {
+        res.status(500);
+        res.json(error);
+    });
+});
 
 
 module.exports = router;
