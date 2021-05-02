@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:userID', async (req, res) => {
-  const userID= Number(req.params.userID);
+  const userID = req.params.userID;
   const result = await db.get(userID);
   res.json(result);
 }); 
@@ -18,6 +18,7 @@ router.post('/', (req, res) => {
   db.create(req.body).then((user) => {
       res.json(user);
   }).catch((error) => {
+      console.error(error);
       res.status(500);
       res.json(error);
   });

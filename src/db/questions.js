@@ -4,11 +4,11 @@ const fs = require('fs');
 const counter = require('./counter');
  
 const schema = Joi.object().keys({
-    username: Joi.string().alphanum().required(),
+    userid: Joi.string().alphanum().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
 });
- 
+
 const questions = db.get('questions');
  
 function getAll() {
@@ -26,10 +26,9 @@ async function create(question) {
         const d = new Date();
         const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
         question.created = date;
-
-        /* todo: 향후 username 대신 userid로 변경 필요 */
+        
         const contents = question.content;
-        filename = question['username'] + date;
+        filename = question.userid + date;
         question.content = fileDir + filename;
         
         let stream = fs.createWriteStream(fileDir + filename);
