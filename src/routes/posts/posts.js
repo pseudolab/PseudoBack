@@ -50,15 +50,16 @@ router.get('/:id', (req, res) => {
 const multerConfig = {
     storage: multer.diskStorage({
     destination: function (req, file, next) {
-        //let text = req.body.message;
-        //let now = Date.now();
-        fs.writeFile(path.join(__dirname, './images/' + file.originalname ), text, console.log);
-        next(null, '/');
-        }
+            next(null, 'images');
+    },
+    filename: function (req, file, next) {
+        next(null, Date.now()+'_'+file.originalname)
+    }
    })
   };
-  router.post('/', multer(multerConfig).array('image'),function(req, res){
-      console.log(req.body.username);
+
+  router.post('/', multer(multerConfig).array('images'),function(req, res){
+      const files = req.files
       posts.create(req.body).then((post) => {
         const fs = require('fs');
         try{
@@ -73,70 +74,6 @@ const multerConfig = {
         res.status(500);
         res.json(error);
     });
-    });
-
-
-router.post('/sss', (req, res) => {
-    var body = '';
-    req.on('data', function(chunk) { 
-
-      body += chunk;
-
-    });
-
-    req.on('end', function() {
-        const data = querystring.parse(body, 'name="', '"\r\n\r\n');
-        let obj = JSON.parse(JSON.stringify(data));
-        
-        let output = {};
-        Object.keys(obj).forEach((item) => {
-            if(obj[item] == null || obj[item] == "") {
-                delete obj[item];
-            }
-            else{
-                if(item == 'keyword' || item == 'cowriter'){
-                    output[item] =  obj[item].replace(/\r\n.*/g,'').split(",");
-                } else {
-                    output[item] = obj[item].replace(/\r\n.*/g,'');
-                }
-            }
-        });
-
-        posts.create(output).then((post) => {
-            const fs = require('fs');
-    
-            try{
-                const filename = post['content'];
-                const content = fs.readFileSync(filename).toString();
-                post['content'] = content;
-            } catch(error){
-                console.log(error);
-            }
-            res.json(post);
-        }).catch((error) => {
-            res.status(500);
-            res.json(error);
-        });
-
-    }); 
-    
-    /*
-    posts.create(req.body).then((post) => {
-        const fs = require('fs');
-
-        try{
-            const filename = post['content'];
-            const content = fs.readFileSync(filename).toString();
-            post['content'] = content;
-        } catch(error){
-            console.log(error);
-        }
-        res.json(post);
-    }).catch((error) => {
-        res.status(500);
-        res.json(error);
-    });
-    */
 });
 
 router.delete('/:id', (req, res) => {
