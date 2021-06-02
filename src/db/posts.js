@@ -15,7 +15,6 @@ const schema = Joi.object().keys({
 const posts = db.get('posts');
  
 function getAll(queryMap) {
-    console.log(queryMap);
     return posts.find(queryMap);
 }
 
@@ -24,6 +23,40 @@ function get(id) {
 }
  
 async function create(post) {
+    const result = schema.validate(post);
+    if (result.error == null) {
+        const fileDir =  './content/';
+        const d = new Date();
+        const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
+        post.created = date;
+
+        /* todo: 향후 username 대신 userid로 변경 필요 */
+        const contents = post.content;
+        filename = post['username'] + date;
+        post.content = fileDir + filename;
+        
+        let stream = fs.createWriteStream(fileDir + filename);
+        stream.once('open', function(fd) {
+            stream.write(contents);
+            stream.end();
+        });
+
+        const count = await counter.getCounter("posts");
+        post.postID = count;
+        
+        return posts.insert(post);
+    } else {
+        console.log('error');
+        return Promise.reject(result.error);
+    }
+}
+
+function remove(id) {
+    return posts.remove({"postID":id});
+}
+ 
+
+async function update(post) {
     if (!post.username) post.username = 'Anonymous';
 
     const result = schema.validate(post);
@@ -54,9 +87,10 @@ async function create(post) {
         return Promise.reject(result.error);
     }
 }
- 
+
 module.exports = {
     create,
     getAll,
-    get
+    get,
+    remove
 };;

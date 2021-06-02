@@ -20,8 +20,6 @@ function get(id) {
 }
  
 async function create(question) {
-    if (!question.username) question.username = 'Anonymous';
-
     const result = schema.validate(question);
     if (result.error == null) {
         const fileDir =  './content/';
@@ -42,7 +40,6 @@ async function create(question) {
 
         const count = await counter.getCounter("questions");
         question.postID = count;
-        console.log("testset" + count);
         
         return questions.insert(question);
     } else {

@@ -8,6 +8,7 @@ const authsRouter = require('./auths');
 const qnasRouter = require('./qnas');
 const pofilesRouter = require('./profiles');
 const devRouter = require('./dev');
+const categoriesRouter = require('./categories');
 const { requireLogin } = require('../lib/middlewares');
 
 //request 요청 URL과 처리 로직을 선언한 라우팅 모듈 매핑
@@ -21,11 +22,13 @@ router.use('/users', usersRouter)
 router.use('/auths', authsRouter)
 router.use('/users', usersRouter);
 router.use('/qnas', qnasRouter);
+
 console.log(process.env.NODE_ENV)
 if(process.env.NODE_ENV === 'development'){
   router.use('/dev', devRouter);
 }
 router.use('/profiles', requireLogin, pofilesRouter);
+router.use('/categories', categoriesRouter);
 
 // Add more routes here if you want!
 module.exports = router
