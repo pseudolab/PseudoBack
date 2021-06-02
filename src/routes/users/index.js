@@ -16,11 +16,11 @@ router.get('/:userID', async (req, res) => {
 router.post('/', (req, res) => {
   console.log(req.body);
   db.create(req.body).then((user) => {
-      res.json(user);
+    res.json(user);
   }).catch((error) => {
-      console.error(error);
-      res.status(500);
-      res.json(error);
+    console.error(error);
+    res.status(500);
+    res.json(error);
   });
 });
 
