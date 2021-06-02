@@ -21,23 +21,29 @@ const baseSchema = Joi.object().keys({
     provider: Joi.string().valid('google', 'local'),
 });
 
-const Gmail = Joi.object().keys({
-    value: Joi.string().email(),
-    verified: Joi.bool()
-});
+// const Gmail = Joi.object().keys({
+//     value: Joi.string().email(),
+//     verified: Joi.bool()
+// });
+
+// const googleRawProfileSchema = Joi.object().keys({
+//     displayName: Joi.object().keys({
+//         value: Joi.string().required()
+//     }).required(),
+//     emails: Joi.array().items(Gmail).required(),
+//     photos: Joi.array(),
+//     provider: 'google',
+//     _raw: Joi.any(),
+//     _json: Joi.any(),
+//     userID: Joi.any().required(),
+//     refreshToken: Joi.any(),
+//     accessToken: Joi.any(),
+// });
 
 const googleProfileSchema = Joi.object().keys({
-    displayName: Joi.object().keys({
-        value: Joi.string().required()
-    }).required(),
-    emails: Joi.array().items(Gmail).required(),
-    photos: Joi.array(),
     provider: 'google',
-    _raw: Joi.any(),
-    _json: Joi.any(),
-    userID: Joi.number().unsafe().required(),
-    refreshToken: Joi.any(),
-    accessToken: Joi.any(),
+    photo: Joi.string(),
+    userID: Joi.any().required(),
 });
 
 const localProfileSchema = Joi.object().keys({
@@ -99,6 +105,20 @@ async function create(user) {
     if (socialType === 'local') {
         if (!user.userName) user.userName = 'Anonymous';
     } else if(socialType==='google'){
+        // // when using raw google profile schema
+        // const result = googleProfileSchema.validate(user, {
+        //     allowUnknown: true
+        // });
+
+        // if (result.error) {
+        //     throw result.error;
+        // }
+        
+        // user.id = user.userID + '';
+        // user.userName = user.displayName.value;
+        // user.userMail = user.emails[0].value;
+
+        // when using extracted google profile schema
         const result = googleProfileSchema.validate(user, {
             allowUnknown: true
         });
@@ -108,8 +128,6 @@ async function create(user) {
         }
         
         user.id = user.userID + '';
-        user.userName = user.displayName.value;
-        user.userMail = user.emails[0].value;
     }
 
     const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
