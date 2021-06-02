@@ -12,7 +12,7 @@ const categoriesRouter = require('./categories');
 router.use('/posts', postsRouter);
 router.use('/users', usersRouter);
 router.use('/qnas', qnasRouter);
-router.use('/profiles', pofilesRouter);
+router.use('/profiles', requireLogin, pofilesRouter);
 router.use('/categories', categoriesRouter);
 
 // Add more routes here if you want!
