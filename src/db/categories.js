@@ -3,7 +3,7 @@ const db = require('./connection');
  
 const schema = Joi.object().keys({
     categoryName: Joi.string().required(),
-    cowriter: Joi.array().items(Joi.string())
+    cowriter: Joi.array().items(Joi.string().alphanum())
 });
  
 const posts = db.get('categories');

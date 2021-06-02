@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:userID', async (req, res) => {
-  const userID= Number(req.params.userID);
+  const userID = req.params.userID;
   const result = await db.get(userID);
   res.json(result);
 }); 
@@ -16,10 +16,11 @@ router.get('/:userID', async (req, res) => {
 router.post('/', (req, res) => {
   console.log(req.body);
   db.create(req.body).then((user) => {
-      res.json(user);
+    res.json(user);
   }).catch((error) => {
-      res.status(500);
-      res.json(error);
+    console.error(error);
+    res.status(500);
+    res.json(error);
   });
 });
 

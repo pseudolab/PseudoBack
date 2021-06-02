@@ -24,7 +24,7 @@ const users = db.get('users');
 
 function get(userID){
     return users.findOne({
-        "userID":userID
+        id:userID
     });
 }
  

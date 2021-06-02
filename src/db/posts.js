@@ -4,6 +4,7 @@ const fs = require('fs');
 const counter = require('./counter');
  
 const schema = Joi.object().keys({
+    userid: Joi.string().alphanum().required(),
     username: Joi.string().alphanum().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
@@ -30,9 +31,8 @@ async function create(post) {
         const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
         post.created = date;
 
-        /* todo: 향후 username 대신 userid로 변경 필요 */
         const contents = post.content;
-        filename = post['username'] + date;
+        filename = post.userid + date;
         post.content = fileDir + filename;
         
         let stream = fs.createWriteStream(fileDir + filename);
@@ -66,9 +66,8 @@ async function update(post) {
         const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
         post.created = date;
 
-        /* todo: 향후 username 대신 userid로 변경 필요 */
         const contents = post.content;
-        filename = post['username'] + date;
+        filename = post.userid + date;
         post.content = fileDir + filename;
         
         let stream = fs.createWriteStream(fileDir + filename);
