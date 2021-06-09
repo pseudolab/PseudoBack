@@ -4,7 +4,8 @@ const users = require('@db/users');
 
 async function requireLogin(req, res, next) {
   try {
-    const token = req.query.id_token;
+    // const token = req.query.id_token;
+    const token = req.get('auth-token');
     // get user id
     const userInfo = await social.getGoogleUserInfo(token);
     // check user exists
