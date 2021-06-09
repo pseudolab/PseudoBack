@@ -9,6 +9,15 @@ router.get('/my', async (req, res) => {
   res.json(myProfile);
 }); 
 
+// TODO: remove this (임시 테스트 라우트)
+router.post('/post', async (req, res) => {
+  console.info('got POST' , req.body);
+
+  res.json({
+    res: req.body
+  })
+})
+
 router.get('/:userID', async (req, res) => {
   const userID = req.params.userID;
   const foundUser = await db.get(userID);
