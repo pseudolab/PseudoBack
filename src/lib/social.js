@@ -10,11 +10,7 @@ const client = new OAuth2Client(GOOGLE_APP_ID);
 /**
  * 
  * @param {string} id_token 
-<<<<<<< HEAD
- * @returns 
-=======
  * @returns {string}
->>>>>>> Pseudo-Lab-main
  */
 async function getGoogleUserID(id_token) {
   const ticket = await client.verifyIdToken({
@@ -28,10 +24,6 @@ async function getGoogleUserID(id_token) {
   return userid;
 }
 
-<<<<<<< HEAD
-module.exports = {
-  getGoogleUserID
-=======
 async function getGoogleUserInfo(id_token) {
   const ticket = await client.verifyIdToken({
     idToken: id_token,
@@ -54,5 +46,4 @@ async function getGoogleUserInfo(id_token) {
 module.exports = {
   getGoogleUserID,
   getGoogleUserInfo
->>>>>>> Pseudo-Lab-main
 }

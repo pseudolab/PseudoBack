@@ -25,9 +25,6 @@ async function create(reply) {
         const date = d.getFullYear() + ("0" + (d.getMonth()+1)).slice(-2) + ("0" + d.getDate()).slice(-2)  + ("0" + d.getHours()).slice(-2)  + ("0" + d.getMinutes()).slice(-2)  + ("0" + d.getSeconds()).slice(-2);
         reply.created = date;
 
-        /* todo: 향후 username 대신 userid로 변경 필요 */
-        
-        
         return replys.insert(reply);
     } else {
         console.log('error');
