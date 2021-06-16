@@ -27,8 +27,14 @@ function create(category) {
     }
 }
 
-function update(name, cowriter) {
-    return categories.update({"categoryName":name}, { $set: {"cowriter": cowriter}});
+function update(name, category) {
+    const result = schema.validate(category);
+    if (result.error == null) {
+        return categories.update({"categoryName":name}, { $set: category});
+    } else {
+        console.log('error');
+        return Promise.reject(result.error);
+    }
 }
 
 function remove(name) {
