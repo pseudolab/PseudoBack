@@ -4,6 +4,10 @@ const db = require('./connection');
 const schema = Joi.object().keys({
     categoryName: Joi.string().required(),
     description: Joi.string().required(),
+    color: Joi.string().required(),
+    builder: Joi.string().required(),
+    startDate: Joi.date().required(),
+    endDate: Joi.date().required(),
     cowriter: Joi.array().items(Joi.string().alphanum())
 });
  
