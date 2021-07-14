@@ -25,8 +25,9 @@ async function requireLogin(req, res, next) {
         photo: userInfo.photo
       })
       
-      res.json(createdUser);
-      return;
+      // res.json(createdUser);
+      // return;
+      req.user = createdUser;
     }
     req.user = user;
     next();

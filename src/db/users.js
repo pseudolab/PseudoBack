@@ -3,7 +3,7 @@ const db = require('./connection');
 
 const baseSchema = Joi.object().keys({
     id: Joi.string().alphanum().required(),
-    userName: Joi.string().alphanum().min(3).max(40).required(),
+    userName: Joi.string().min(3).max(40).required(),
     userPoint: Joi.number().default(0),
     userClass: Joi.string().alphanum().default('bronze'),
     isAdmin: Joi.boolean().default(false),
