@@ -45,7 +45,7 @@ const userStatsSchema = Joi.object({
     }).default(),
     numBoard: Joi.number().default(0),
     numReply: Joi.number().default(0),
-    activityRate: Joi.object({
+    activity: Joi.object({
         post: Joi.number().default(0),
         vote: Joi.number().default(0),
         comment: Joi.number().default(0),
@@ -54,7 +54,7 @@ const userStatsSchema = Joi.object({
         question: Joi.number().default(0)
     }).default(),
     followingStudy: Joi.array().items(studySchema).default([]),
-    activityCalendar: Joi.array().items(userActivity).default([])
+    activityHistory: Joi.array().items(userActivity).default([])
 })
 
 // const Gmail = Joi.object({
@@ -165,7 +165,7 @@ async function create(user) {
         const d = new Date();
         user.created = d;
         
-        const userStats = userStatsSchema.validate({});
+        const userStats = userStatsSchema.validate({}).value;
 
         user.stats = userStats;
         
@@ -175,10 +175,28 @@ async function create(user) {
         throw result.error;
     }
 }
- 
+
+async function updateStats(user, statinfo) {
+    const statsValidation = userStatsSchema.validate(statinfo);
+    // handle validation error
+    if (statsValidation.error) {
+        console.error(statsValidation.error);
+        throw statsValidation.error;
+    }
+    const userStats = statsValidation.value;
+
+    user.stats = userStats;
+    return users.update({
+        id: user.id
+    }, {
+        $set: user
+    });
+}
+
 module.exports = {
     create,
     getAll,
     get,
-    dropAll
+    dropAll,
+    updateStats,
 };
