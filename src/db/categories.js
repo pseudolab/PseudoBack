@@ -8,7 +8,7 @@ const schema = Joi.object().keys({
     builder: Joi.string().required(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
-    cowriter: Joi.array().items(Joi.string().alphanum())
+    cowriter: Joi.array().items(Joi.object({id:Joi.string(), name:Joi.string(), status:Joi.boolean()}))
 });
  
 const categories = db.get('categories');
