@@ -28,10 +28,10 @@ module.exports = {
         // TODO: update user statistics
         let userpoint = await users.getUserPoint(user.id);
         console.info('point: ', userpoint);
-        // await users.updateUserPoint(user.id, userpoint+1);
-        userpoint += 1;
+        await users.updateStatsInfo(user);
+        // userpoint += 1;
 
-        user.stats.userpoint += 1;
+        // user.stats.userpoint += 1;
 
       })
     })

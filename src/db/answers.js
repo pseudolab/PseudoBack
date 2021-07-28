@@ -47,8 +47,8 @@ async function create(answer) {
         return Promise.reject(result.error);
     }
 }
- 
+
 module.exports = {
     create,
     get
-};;
+};

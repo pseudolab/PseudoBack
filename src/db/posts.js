@@ -2,7 +2,7 @@ const Joi = require('joi');
 const db = require('./connection');
 const fs = require('fs');
 const counter = require('./counter');
- 
+
 const schema = Joi.object().keys({
     userid: Joi.string().alphanum().required(),
     username: Joi.string().alphanum().required(),
@@ -43,7 +43,7 @@ async function create(post) {
 
         const count = await counter.getCounter("posts");
         post.postID = count;
-        
+
         return posts.insert(post);
     } else {
         console.log('error');
@@ -55,7 +55,6 @@ function remove(id) {
     return posts.remove({"postID":id});
 }
  
-
 async function update(post) {
     if (!post.username) post.username = 'Anonymous';
 

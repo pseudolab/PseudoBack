@@ -7,6 +7,10 @@ const usersDB = require('@db/users');
 
 chai.use(require('chai-http'))
 
+// mock requireLogin
+const requireLogin = require('../../../lib/middleware/requireLogin')
+const mockRequireLogin = require('../../mocks/middleware/requireLogin')
+
 describe('pseudo-back', ()=>{
   let server
   let agent
