@@ -1,17 +1,21 @@
 const dev = require('express').Router();
-const db = require('@db/users');
+const users = require('@db/users');
+const { requireLogin } = require('../../lib/middlewares');
+
+const userRouter = require('./user');
 
 dev.get('/check', (req, res) => {
   console.info('check call');
   res.sendStatus(200);
 })
 
-dev.get('/reset', async (req,res)=>{
-  console.log('delete all');
+dev.get('/user/reset', async (req,res)=>{
+  console.warn('DROP ALL USERS');
   
-  await db.dropAll();
+  await users.dropAll();
   res.sendStatus(203);
-  
 })
+
+dev.use('/user', requireLogin, userRouter);
 
 module.exports = dev;

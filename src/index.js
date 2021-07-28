@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const http = require('http');
 const path = require('path');
+const jobs = require('@lib/job');
 
 const app = express();
 
@@ -23,6 +24,8 @@ app.use(['/routes', '/api/routes'], routes)
 app.use('/static', express.static(path.join(__dirname, 'dist')))
 
 app.set('port', process.env.PORT || 4000);
+
+jobs.run();
 
 //서버 생성
 exports.server = http.createServer(app).listen(app.get('port'), function(){
