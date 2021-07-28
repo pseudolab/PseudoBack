@@ -176,6 +176,23 @@ async function create(user) {
     }
 }
 
+async function updateProfileImageURL(user, profileImageURL) {
+    // validate user
+    const userSchema = schemas[user.provider];
+    const result = userSchema.validate(user);
+    if (result.error) {
+        throw result.error;
+    }
+
+    user.profileImageURL = profileImageURL;
+
+    return users.update({
+        id: user.id
+    }, {
+        $set: user
+    });
+}
+
 async function updateStats(user, statinfo) {
     const statsValidation = userStatsSchema.validate(statinfo);
     // handle validation error
@@ -199,4 +216,5 @@ module.exports = {
     get,
     dropAll,
     updateStats,
+    updateProfileImageURL,
 };
