@@ -27,10 +27,9 @@ const multerConfig = {
  })
 };
 
-router.get('/my', async (req, res) => {
+router.get('/my', requireLogin, async (req, res) => {
   // requireLogin registers req.user
   const myProfile = req.user;
-  console.info('my profile route called')
 
   res.json(myProfile);
 }); 
