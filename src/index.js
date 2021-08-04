@@ -22,6 +22,7 @@ app.use(cors());
 
 app.use(['/routes', '/api/routes'], routes)
 app.use('/static', express.static(path.join(__dirname, 'dist')))
+app.use('/image', express.static(path.join(__dirname, '../images')))
 
 app.set('port', process.env.PORT || 4000);
 
