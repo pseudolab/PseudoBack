@@ -10,10 +10,12 @@ const baseSchema = Joi.object({
     userMail: Joi.string().email().required(),
     description: Joi.string().max(300).default(''),
     // TODO: Add default image file
+    // TODO: move to profile schema
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
-        ]
+        ],
+        allowRelative: true
     }),
     provider: Joi.string().valid('google', 'local'),
 });
@@ -56,25 +58,6 @@ const userStatsSchema = Joi.object({
     followingStudy: Joi.array().items(studySchema).default([]),
     activityHistory: Joi.array().items(userActivity).default([])
 })
-
-// const Gmail = Joi.object({
-//     value: Joi.string().email(),
-//     verified: Joi.bool()
-// });
-
-// const googleRawProfileSchema = Joi.object({
-//     displayName: Joi.object({
-//         value: Joi.string().required()
-//     }).required(),
-//     emails: Joi.array().items(Gmail).required(),
-//     photos: Joi.array(),
-//     provider: 'google',
-//     _raw: Joi.any(),
-//     _json: Joi.any(),
-//     userID: Joi.any().required(),
-//     refreshToken: Joi.any(),
-//     accessToken: Joi.any(),
-// });
 
 const googleProfileSchema = Joi.object({
     provider: 'google',
@@ -179,18 +162,23 @@ async function create(user) {
 async function updateProfileImageURL(user, profileImageURL) {
     // validate user
     const userSchema = schemas[user.provider];
-    const result = userSchema.validate(user);
+    const result = userSchema.validate(user, {
+        allowUnknown: true
+    });
+    
     if (result.error) {
         throw result.error;
     }
 
-    user.profileImageURL = profileImageURL;
-
+    // update user using monk
+    const update = {
+        $set: {
+            profileImageURL
+        }
+    };
     return users.update({
         id: user.id
-    }, {
-        $set: user
-    });
+    }, update);
 }
 
 async function updateStats(user, statinfo) {
