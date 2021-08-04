@@ -1,8 +1,10 @@
 const Joi = require('joi');
 const db = require('./connection');
+const monk = require('monk');
+const _ = require('lodash');
 
 const baseSchema = Joi.object({
-    id: Joi.string().alphanum().required(),
+    id: Joi.string().required(),
     isAdmin: Joi.boolean().default(false),
     // TODO: Add default image file
     // TODO: move to profile schema
@@ -11,11 +13,11 @@ const baseSchema = Joi.object({
 
 const profileSchema = Joi.object({
     userName: Joi.string().min(3).max(40),
+    userMail: Joi.string().email(),
     birth: Joi.number(),
     phone: Joi.number(),
     description: Joi.string().max(400).default(''),
     region: Joi.string().max(100).default(''),
-    userMail: Joi.string().email(),
     github: Joi.string().max(100).default(''),
     linkedIn: Joi.string().max(100).default(''),
     facebook: Joi.string().max(100).default(''),
@@ -69,9 +71,10 @@ const userStatsSchema = Joi.object({
 })
 
 const googleProfileSchema = Joi.object({
-    provider: 'google',
-    photo: Joi.string(),
     userID: Joi.any().required(),
+    userName: Joi.string().required(),
+    userMail: Joi.string().email().required(),
+    photo: Joi.string(),
 });
 
 const localProfileSchema = Joi.object({
@@ -81,8 +84,15 @@ const localProfileSchema = Joi.object({
 });
 
 const schemas = {
-    google: baseSchema.concat(googleProfileSchema).concat(profileSchema),
-    local: baseSchema.concat(localProfileSchema).concat(profileSchema)
+    google: baseSchema.keys({
+        google: googleProfileSchema,
+        profile: profileSchema,
+        stats: userStatsSchema
+    }),
+    local: baseSchema.concat(localProfileSchema).keys({
+        profile: profileSchema,
+        stats: userStatsSchema
+    })
 };
  
 const users = db.get('users');
@@ -134,7 +144,7 @@ async function create(user) {
         if (!user.userName) user.userName = 'Anonymous';
     } else if(socialType==='google'){
         // when using extracted google profile schema
-        const result = googleProfileSchema.validate(user, {
+        const result = googleProfileSchema.validate(user.google, {
             allowUnknown: true
         });
 
@@ -142,7 +152,13 @@ async function create(user) {
             throw result.error;
         }
 
-        user.id = user.userID + '';
+        _.merge(user, {
+            profile: {
+                userName: user.google.userName,
+                userMail: user.google.userMail,
+                profileImageURL: user.google.photo,
+            }
+        });
     }
 
     const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
@@ -151,16 +167,15 @@ async function create(user) {
         exists.exists = true;
         return exists;
     }
+
+    const newId = await monk.id() + '';
+    user.id = newId;
     
     const result = schema.validate(user);
     if (result.error == null) {
         const d = new Date();
         user.created = d;
-        
-        const userStats = userStatsSchema.validate({}).value;
 
-        user.stats = userStats;
-        
         return users.insert(user);
     } else {
         console.error(result.error);
@@ -168,26 +183,35 @@ async function create(user) {
     }
 }
 
-async function updateProfileImageURL(user, profileImageURL) {
-    // validate user
-    const userSchema = schemas[user.provider];
-    const result = userSchema.validate(user, {
-        allowUnknown: true
-    });
-    
-    if (result.error) {
-        throw result.error;
+// update profile
+async function updateProfile(user, key, value) {
+    const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
+    if (!exists) {
+        throw new Error('User not found');
     }
 
-    // update user using monk
-    const update = {
-        $set: {
-            profileImageURL
-        }
-    };
-    return users.update({
-        id: user.id
-    }, update);
+    const result = profileSchema.validate(user, {
+        allowUnknown: true
+    });
+
+    if (result.error == null) {
+        const d = new Date();
+        user.updated = d;
+        user.profile[key] = value;
+
+        return users.update({
+            id: user.id
+        }, {
+            $set: user
+        });
+    } else {
+        console.error(result.error);
+        return result.error;
+    }
+}
+
+async function updateProfileImageURL(user, profileImageURL) {
+    updateProfile(user, 'profileImageURL', profileImageURL);
 }
 
 async function updateStats(user, statinfo) {
@@ -213,5 +237,6 @@ module.exports = {
     get,
     dropAll,
     updateStats,
+    updateProfile,
     updateProfileImageURL,
 };
