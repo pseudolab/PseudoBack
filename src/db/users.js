@@ -84,13 +84,11 @@ const localProfileSchema = Joi.object({
 });
 
 const schemas = {
-    google: baseSchema.keys({
+    google: baseSchema.concat(profileSchema).keys({
         google: googleProfileSchema,
-        profile: profileSchema,
         stats: userStatsSchema
     }),
-    local: baseSchema.concat(localProfileSchema).keys({
-        profile: profileSchema,
+    local: baseSchema.concat(profileSchema).concat(localProfileSchema).keys({
         stats: userStatsSchema
     })
 };
@@ -153,11 +151,9 @@ async function create(user) {
         }
 
         _.merge(user, {
-            profile: {
-                userName: user.google.userName,
-                userMail: user.google.userMail,
-                profileImageURL: user.google.photo,
-            }
+            userName: user.google.userName,
+            userMail: user.google.userMail,
+            profileImageURL: user.google.photo,
         });
     }
 
@@ -197,7 +193,7 @@ async function updateProfile(user, key, value) {
     if (result.error == null) {
         const d = new Date();
         user.updated = d;
-        user.profile[key] = value;
+        user[key] = value;
 
         return users.update({
             id: user.id

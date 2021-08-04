@@ -20,7 +20,7 @@ const multerConfig = {
   },
   // TODO: validate path, check success
   filename: function (req, file, next) {
-    const imagePath = `profile_${req.user.profile.userName}_${file.originalname}`;
+    const imagePath = `profile_${req.user.userName}_${file.originalname}`;
     req.user.profileImageURL = path.join(ProfileImageBasePath, imagePath);
     next(null, imagePath);
   }
