@@ -3,21 +3,30 @@ const db = require('./connection');
 
 const baseSchema = Joi.object({
     id: Joi.string().alphanum().required(),
-    userName: Joi.string().min(3).max(40).required(),
     isAdmin: Joi.boolean().default(false),
-    birth: Joi.number(),
-    phone: Joi.number(),
-    userMail: Joi.string().email().required(),
-    description: Joi.string().max(300).default(''),
     // TODO: Add default image file
     // TODO: move to profile schema
+    provider: Joi.string().valid('google', 'local'),
+});
+
+const profileSchema = Joi.object({
+    userName: Joi.string().min(3).max(40),
+    birth: Joi.number(),
+    phone: Joi.number(),
+    description: Joi.string().max(400).default(''),
+    region: Joi.string().max(100).default(''),
+    userMail: Joi.string().email(),
+    github: Joi.string().max(100).default(''),
+    linkedIn: Joi.string().max(100).default(''),
+    facebook: Joi.string().max(100).default(''),
+    googleScholar: Joi.string().max(100).default(''),
+    website: Joi.string().max(100).default(''),
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
         ],
         allowRelative: true
     }),
-    provider: Joi.string().valid('google', 'local'),
 });
 
 // TODO: refer separate study schema
@@ -72,8 +81,8 @@ const localProfileSchema = Joi.object({
 });
 
 const schemas = {
-    google: baseSchema.concat(googleProfileSchema),
-    local: baseSchema.concat(localProfileSchema)
+    google: baseSchema.concat(googleProfileSchema).concat(profileSchema),
+    local: baseSchema.concat(localProfileSchema).concat(profileSchema)
 };
  
 const users = db.get('users');
