@@ -20,7 +20,7 @@ const multerConfig = {
   },
   // TODO: validate path, check success
   filename: function (req, file, next) {
-    const imagePath = `profile_${req.user.id}_${file.originalname}`;
+    const imagePath = `profile_${req.user.profile.userName}_${file.originalname}`;
     req.user.profileImageURL = path.join(ProfileImageBasePath, imagePath);
     next(null, imagePath);
   }
@@ -35,14 +35,19 @@ router.get('/my', async (req, res) => {
   res.json(myProfile);
 }); 
 
-// TODO: remove this (임시 테스트 라우트)
-router.post('/post', async (req, res) => {
-  console.info('got POST' , req.body);
+// update user.profile.property
+router.post('/update', requireLogin, async (req, res) => {
+  const { key, value } = req.body;
+  const user = req.user;
 
-  res.json({
-    res: req.body
-  })
-})
+  const result = await users.updateProfile(user, key, value);
+
+  if (result.ok) {
+    res.json({
+      res: 'success'
+    });
+  }
+});
 
 // retrieve my profile image
 router.get('/image', requireLogin, async (req, res) => {
@@ -57,11 +62,8 @@ router.post('/image', requireLogin, multer(multerConfig).single('image'), async 
   console.info('got image POST', req.body);
 
   const user = req.user;
-  // set user's image url
-  console.info('file info: ', req.file);
-  // const profileImageURL = new URL(encodeURI(`http://localhost:${process.env.PORT}/${req.file.path}`));
   const profileImageURL = `http://${Host}:${Port}/${req.file.path}`;
-  console.info('url: ', profileImageURL);
+  
   users.updateProfileImageURL(user, profileImageURL);
   
   res.json({
