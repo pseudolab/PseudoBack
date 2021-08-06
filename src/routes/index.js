@@ -14,7 +14,7 @@ const devRouter = require('./dev');
 router.use('/posts', postsRouter);
 router.use('/users', usersRouter);
 router.use('/qnas', qnasRouter);
-router.use('/profiles', pofilesRouter);
+router.use('/profiles', requireLogin, pofilesRouter);
 router.use('/categories', categoriesRouter);
 
 if(process.env.NODE_ENV === 'development') {
