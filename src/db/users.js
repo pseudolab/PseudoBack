@@ -1,21 +1,34 @@
 const Joi = require('joi');
 const db = require('./connection');
+const monk = require('monk');
+const _ = require('lodash');
 
 const baseSchema = Joi.object({
-    id: Joi.string().alphanum().required(),
-    userName: Joi.string().min(3).max(40).required(),
+    id: Joi.string().required(),
     isAdmin: Joi.boolean().default(false),
+    // TODO: Add default image file
+    // TODO: move to profile schema
+    provider: Joi.string().valid('google', 'local'),
+});
+
+const profileSchema = Joi.object({
+    userName: Joi.string().min(3).max(40),
+    userMail: Joi.string().email(),
     birth: Joi.number(),
     phone: Joi.number(),
-    userMail: Joi.string().email().required(),
-    description: Joi.string().max(300).default(''),
-    // TODO: Add default image file
+    description: Joi.string().max(400).default(''),
+    region: Joi.string().max(100).default(''),
+    github: Joi.string().max(100).default(''),
+    linkedIn: Joi.string().max(100).default(''),
+    facebook: Joi.string().max(100).default(''),
+    googleScholar: Joi.string().max(100).default(''),
+    website: Joi.string().max(100).default(''),
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
-        ]
+        ],
+        allowRelative: true
     }),
-    provider: Joi.string().valid('google', 'local'),
 });
 
 // TODO: refer separate study schema
@@ -57,29 +70,11 @@ const userStatsSchema = Joi.object({
     activityHistory: Joi.array().items(userActivity).default([])
 })
 
-// const Gmail = Joi.object({
-//     value: Joi.string().email(),
-//     verified: Joi.bool()
-// });
-
-// const googleRawProfileSchema = Joi.object({
-//     displayName: Joi.object({
-//         value: Joi.string().required()
-//     }).required(),
-//     emails: Joi.array().items(Gmail).required(),
-//     photos: Joi.array(),
-//     provider: 'google',
-//     _raw: Joi.any(),
-//     _json: Joi.any(),
-//     userID: Joi.any().required(),
-//     refreshToken: Joi.any(),
-//     accessToken: Joi.any(),
-// });
-
 const googleProfileSchema = Joi.object({
-    provider: 'google',
-    photo: Joi.string(),
     userID: Joi.any().required(),
+    userName: Joi.string().required(),
+    userMail: Joi.string().email().required(),
+    photo: Joi.string(),
 });
 
 const localProfileSchema = Joi.object({
@@ -89,8 +84,13 @@ const localProfileSchema = Joi.object({
 });
 
 const schemas = {
-    google: baseSchema.concat(googleProfileSchema),
-    local: baseSchema.concat(localProfileSchema)
+    google: baseSchema.concat(profileSchema).keys({
+        google: googleProfileSchema,
+        stats: userStatsSchema
+    }),
+    local: baseSchema.concat(profileSchema).concat(localProfileSchema).keys({
+        stats: userStatsSchema
+    })
 };
  
 const users = db.get('users');
@@ -142,7 +142,7 @@ async function create(user) {
         if (!user.userName) user.userName = 'Anonymous';
     } else if(socialType==='google'){
         // when using extracted google profile schema
-        const result = googleProfileSchema.validate(user, {
+        const result = googleProfileSchema.validate(user.google, {
             allowUnknown: true
         });
 
@@ -150,7 +150,11 @@ async function create(user) {
             throw result.error;
         }
 
-        user.id = user.userID + '';
+        _.merge(user, {
+            userName: user.google.userName,
+            userMail: user.google.userMail,
+            profileImageURL: user.google.photo,
+        });
     }
 
     const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
@@ -159,21 +163,51 @@ async function create(user) {
         exists.exists = true;
         return exists;
     }
+
+    const newId = await monk.id() + '';
+    user.id = newId;
     
     const result = schema.validate(user);
     if (result.error == null) {
         const d = new Date();
         user.created = d;
-        
-        const userStats = userStatsSchema.validate({}).value;
 
-        user.stats = userStats;
-        
         return users.insert(user);
     } else {
         console.error(result.error);
         throw result.error;
     }
+}
+
+// update profile
+async function updateProfile(user, key, value) {
+    const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
+    if (!exists) {
+        throw new Error('User not found');
+    }
+
+    const result = profileSchema.validate(user, {
+        allowUnknown: true
+    });
+
+    if (result.error == null) {
+        const d = new Date();
+        user.updated = d;
+        user[key] = value;
+
+        return users.update({
+            id: user.id
+        }, {
+            $set: user
+        });
+    } else {
+        console.error(result.error);
+        return result.error;
+    }
+}
+
+async function updateProfileImageURL(user, profileImageURL) {
+    updateProfile(user, 'profileImageURL', profileImageURL);
 }
 
 async function updateStats(user, statinfo) {
@@ -199,4 +233,6 @@ module.exports = {
     get,
     dropAll,
     updateStats,
+    updateProfile,
+    updateProfileImageURL,
 };
