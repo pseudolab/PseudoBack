@@ -11,18 +11,25 @@ const baseSchema = Joi.object({
     provider: Joi.string().valid('google', 'local'),
 });
 
+// TODO: move to util
+const getStringValidation = (maxlen) => Joi
+    .string()
+    .max(maxlen)
+    .allow('')
+    .default('');
+
 const profileSchema = Joi.object({
     userName: Joi.string().min(3).max(40),
     userMail: Joi.string().email(),
     birth: Joi.number(),
     phone: Joi.number(),
-    description: Joi.string().max(400).default(''),
-    region: Joi.string().max(100).default(''),
-    github: Joi.string().max(100).default(''),
-    linkedIn: Joi.string().max(100).default(''),
-    facebook: Joi.string().max(100).default(''),
-    googleScholar: Joi.string().max(100).default(''),
-    website: Joi.string().max(100).default(''),
+    description: getStringValidation(400),
+    region: getStringValidation(100),
+    github: getStringValidation(100),
+    linkedIn: getStringValidation(100),
+    facebook: getStringValidation(100),
+    googleScholar: getStringValidation(100),
+    website: getStringValidation(100),
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
