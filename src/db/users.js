@@ -198,6 +198,8 @@ async function updateProfile(user, key, value) {
         throw new Error('User not found');
     }
 
+    user[key] = value;
+
     const result = profileSchema.validate(user, {
         allowUnknown: true
     });
@@ -205,7 +207,6 @@ async function updateProfile(user, key, value) {
     if (result.error == null) {
         const d = new Date();
         user.updated = d;
-        user[key] = value;
 
         return users.update({
             id: user.id
