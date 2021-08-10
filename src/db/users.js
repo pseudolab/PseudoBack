@@ -150,11 +150,12 @@ async function create(user) {
             throw result.error;
         }
 
-        _.merge(user, {
+        // merge if not null
+        _.mergeWith({}, user, {
             userName: user.google.userName,
             userMail: user.google.userMail,
             profileImageURL: user.google.photo,
-        });
+        }, (a, b) => b === null ? a : undefined);
     }
 
     const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
@@ -164,11 +165,15 @@ async function create(user) {
         return exists;
     }
 
+    // use custom 'id' field (다른 라우트에서 사용)
+    // NOTE: 내장 '_id' 사용?
     const newId = await monk.id() + '';
     user.id = newId;
     
     const result = schema.validate(user);
     if (result.error == null) {
+        user = result.value;
+
         const d = new Date();
         user.created = d;
 
