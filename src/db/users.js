@@ -11,18 +11,25 @@ const baseSchema = Joi.object({
     provider: Joi.string().valid('google', 'local'),
 });
 
+// TODO: move to util
+const getStringValidation = (maxlen) => Joi
+    .string()
+    .max(maxlen)
+    .allow('')
+    .default('');
+
 const profileSchema = Joi.object({
     userName: Joi.string().min(3).max(40),
     userMail: Joi.string().email(),
     birth: Joi.number(),
     phone: Joi.number(),
-    description: Joi.string().max(400).default(''),
-    region: Joi.string().max(100).default(''),
-    github: Joi.string().max(100).default(''),
-    linkedIn: Joi.string().max(100).default(''),
-    facebook: Joi.string().max(100).default(''),
-    googleScholar: Joi.string().max(100).default(''),
-    website: Joi.string().max(100).default(''),
+    description: getStringValidation(400),
+    region: getStringValidation(100),
+    github: getStringValidation(100),
+    linkedIn: getStringValidation(100),
+    facebook: getStringValidation(100),
+    googleScholar: getStringValidation(100),
+    website: getStringValidation(100),
     profileImageURL: Joi.string().uri({
         scheme: [
             /https?/
@@ -150,11 +157,12 @@ async function create(user) {
             throw result.error;
         }
 
-        _.merge(user, {
+        // merge if not null
+        _.mergeWith({}, user, {
             userName: user.google.userName,
             userMail: user.google.userMail,
             profileImageURL: user.google.photo,
-        });
+        }, (a, b) => b === null ? a : undefined);
     }
 
     const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
@@ -164,11 +172,15 @@ async function create(user) {
         return exists;
     }
 
+    // use custom 'id' field (다른 라우트에서 사용)
+    // NOTE: 내장 '_id' 사용?
     const newId = await monk.id() + '';
     user.id = newId;
     
     const result = schema.validate(user);
     if (result.error == null) {
+        user = result.value;
+
         const d = new Date();
         user.created = d;
 
@@ -186,6 +198,8 @@ async function updateProfile(user, key, value) {
         throw new Error('User not found');
     }
 
+    user[key] = value;
+
     const result = profileSchema.validate(user, {
         allowUnknown: true
     });
@@ -193,7 +207,6 @@ async function updateProfile(user, key, value) {
     if (result.error == null) {
         const d = new Date();
         user.updated = d;
-        user[key] = value;
 
         return users.update({
             id: user.id
