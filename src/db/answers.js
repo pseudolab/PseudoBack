@@ -20,6 +20,15 @@ function get(id) {
 async function create(answer) {
     if (!answer.username) answer.username = 'Anonymous';
 
+    // duplicate check
+    const existing = await get(answer.postID);
+    if (existing.length) {
+        throw {
+            created: false,
+            details: 'answer already exists',
+        };
+    }
+
     const result = schema.validate(answer);
     if (result.error == null) {
         const fileDir =  './content/';

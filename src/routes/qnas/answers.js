@@ -36,7 +36,10 @@ router.get('/:id', (req, res) => {
 
 
 router.post('/', requireLogin, (req, res) => {
-    answers.create(req.body).then((answer) => {
+    const payload = req.body;
+    payload.userid = req.user.id;
+    payload.username = req.user.userName;
+    answers.create(payload).then((answer) => {
         const fs = require('fs');
 
         try{
@@ -48,8 +51,13 @@ router.post('/', requireLogin, (req, res) => {
         }
         res.json(answer);
     }).catch((error) => {
-        res.status(500);
-        res.json(error);
+        if (error.details) {
+            // validation error
+            res.status(400).json(error);
+        } else {
+            // something else
+            res.status(500).json(error);
+        }
     });
 });
 
