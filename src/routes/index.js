@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const { requireLogin } = require('../lib/middlewares');
 
 //라우팅 모듈 선언
 const postsRouter = require('./posts')

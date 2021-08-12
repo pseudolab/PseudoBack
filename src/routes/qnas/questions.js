@@ -10,6 +10,7 @@ const questions = require('@db/questions');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const { requireLogin } = require('@lib');
 
 
 router.use(morgan('tiny'));
@@ -38,7 +39,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', requireLogin, (req, res) => {
     questions.create(req.body).then((question) => {
         const fs = require('fs');
 
@@ -55,7 +56,5 @@ router.post('/', (req, res) => {
         res.json(error);
     });
 });
-
-
 
 module.exports = router;
