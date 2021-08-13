@@ -111,7 +111,7 @@ function getAll() {
 
 function get(id){
     return users.findOne({
-        id
+        "id":id
     });
 }
 
