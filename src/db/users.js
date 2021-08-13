@@ -196,25 +196,33 @@ async function create(user) {
     }
 }
 
-// update profile
-async function updateProfile(user, key, value) {
-    const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
-    if (!exists) {
+// use profileSchema
+async function updateProfiles(userid, profile) {
+    const user = await findById(userid);
+    if (!user) {
         throw new Error('User not found');
     }
 
-    user[key] = value;
-
-    const result = profileSchema.validate(user, {
-        allowUnknown: true
+    const result = profileSchema.validate(profile, {
+        presence: 'optional',
+        // prevent default value overwritting exist value
+        noDefaults: true,
+        // prevent unknown fields
+        stripUnknown: true
     });
 
     if (result.error == null) {
         const d = new Date();
-        user.updated = d;
+        profile.updated = d;
+
+        // merge if null in user
+        _.mergeWith(user, result.value, (a, b) => {
+            if (b === null) return a;
+            return b;
+        });
 
         return users.update({
-            id: user.id
+            id: userid
         }, {
             $set: user
         });
@@ -251,6 +259,6 @@ module.exports = {
     get,
     dropAll,
     updateStats,
-    updateProfile,
+    updateProfiles,
     updateProfileImageURL,
 };
