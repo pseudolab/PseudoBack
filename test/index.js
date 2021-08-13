@@ -11,6 +11,16 @@ chai.use(require('chai-http'))
 
 const USE_FAKE_LOGIN = process.env.USE_FAKE_LOGIN;
 
+// apply global header to all requests
+const header = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  'X-Requested-With': 'XMLHttpRequest',
+}
+
+// chai with a custom header
+
+
 const fixture = {
   new_user_profile: {
     description: 'new user description',
@@ -43,6 +53,7 @@ describe('pseudo-back', ()=>{
       it('should return a user profile with google profile', async ()=>{
         const response = await chai.request(server)
           .get('/routes/profiles/my')
+          .set(header)
         
         expect(response).to.have.status(200)
 
@@ -62,6 +73,7 @@ describe('pseudo-back', ()=>{
           const response = await chai.request(server)
             .put('/routes/profiles/update/' + key)
             .send({ value })
+            .set(header)
           
           expect(response).to.have.status(200)
           expect(response.body).to.deep.equal({ res: 'success' })
@@ -70,6 +82,7 @@ describe('pseudo-back', ()=>{
         it(`should return a user profile with updated ${key}`, async ()=>{
           const response = await chai.request(server)
             .get('/routes/profiles/my')
+            .set(header)
           
           const profile = response.body
           
@@ -77,6 +90,25 @@ describe('pseudo-back', ()=>{
           expect(profile[key]).to.equal(value)
         })
       });
+    })
+
+    describe('qna api', ()=>{
+      it('should handle post answer', async ()=>{
+        const response = await chai.request(server)
+          .post('/routes/qnas/answers')
+          .send({
+            subject: 'test',
+            content: 'test content',
+            postID: 1,
+          })
+          .set(header)
+
+        // console.log(response.body)
+
+        // TODO: post db 초기화 추가
+        expect(response).to.have.status(200)
+        expect(response.body).to.have.property('created')
+      })
     })
   } else {
     // describe('users local old api', ()=>{

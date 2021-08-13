@@ -32,14 +32,13 @@ router.get('/my', requireLogin, async (req, res) => {
   const myProfile = req.user;
 
   res.json(myProfile);
-}); 
+});
 
-router.put('/update/:key', requireLogin, async (req, res) => {
-  const { key } = req.params;
+router.put('/update', requireLogin, async (req, res) => {
   const user = req.user;
-  const value = req.body.value;
+  const profiles = req.body;
 
-  const result = await users.updateProfile(user, key, value);
+  const result = await users.updateProfiles(user.id, profiles);
   if (result.ok) {
     res.json({
       res: 'success'

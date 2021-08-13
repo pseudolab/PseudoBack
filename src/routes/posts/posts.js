@@ -14,6 +14,7 @@ const multer = require('multer');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const { requireLogin } = require('@lib');
 
 router.use(morgan('tiny'));
 router.use(cors());
@@ -58,7 +59,7 @@ const multerConfig = {
    })
   };
 
-  router.post('/', multer(multerConfig).array('images'),function(req, res){
+  router.post('/', requireLogin, multer(multerConfig).array('images'),function(req, res){
       const files = req.files
       posts.create(req.body).then((post) => {
         const fs = require('fs');
@@ -76,7 +77,7 @@ const multerConfig = {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', requireLogin, (req, res) => {
     const postID = Number(req.params.id);
     const result = posts.remove(postID).then((result) => {
         if(result['deletedCount'] == 1){
@@ -88,7 +89,7 @@ router.delete('/:id', (req, res) => {
     })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', requireLogin, (req, res) => {
     posts.create(req.body).then((post) => {
         const fs = require('fs');
         

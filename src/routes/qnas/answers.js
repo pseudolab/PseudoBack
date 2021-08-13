@@ -10,6 +10,7 @@ const answers = require('@db/answers');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const { requireLogin } = require('@lib');
 
 
 router.use(morgan('tiny'));
@@ -34,8 +35,11 @@ router.get('/:id', (req, res) => {
 });
 
 
-router.post('/', (req, res) => {
-    answers.create(req.body).then((answer) => {
+router.post('/', requireLogin, (req, res) => {
+    const payload = req.body;
+    payload.userid = req.user.id;
+    payload.username = req.user.userName;
+    answers.create(payload).then((answer) => {
         const fs = require('fs');
 
         try{
@@ -47,8 +51,13 @@ router.post('/', (req, res) => {
         }
         res.json(answer);
     }).catch((error) => {
-        res.status(500);
-        res.json(error);
+        if (error.details) {
+            // validation error
+            res.status(400).json(error);
+        } else {
+            // something else
+            res.status(500).json(error);
+        }
     });
 });
 

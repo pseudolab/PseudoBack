@@ -23,6 +23,7 @@ async function requireLogin(req, res, next) {
   try {
     const token = req.get('auth-token');
     const userInfo = await social.getGoogleUserInfo(token);
+    // TODO: use googleid
     const user = await users.get(userInfo.userid);
     if(!user) {
       const createdUser = await users.create({
