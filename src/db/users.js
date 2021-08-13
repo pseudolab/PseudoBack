@@ -158,7 +158,7 @@ async function create(user) {
         }
 
         // merge if not null
-        _.mergeWith({}, user, {
+        _.mergeWith(user, {
             userName: user.google.userName,
             userMail: user.google.userMail,
             profileImageURL: user.google.photo,

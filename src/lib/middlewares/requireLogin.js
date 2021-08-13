@@ -4,7 +4,7 @@ const users = require('@db/users');
 require('dotenv').config();
 
 async function requireLogin(req, res, next) {
-  if(process.env.NODE_ENV === 'development' && process.env.USE_FAKE_LOGIN) {
+  if(process.env.NODE_ENV === 'development' && process.env.USE_FAKE_LOGIN == true) {
     const createdUser = await users.create({
       provider: 'google',
       google: {
@@ -23,6 +23,7 @@ async function requireLogin(req, res, next) {
   try {
     const token = req.get('auth-token');
     const userInfo = await social.getGoogleUserInfo(token);
+    // TODO: use googleid
     const user = await users.get(userInfo.userid);
     if(!user) {
       const createdUser = await users.create({
