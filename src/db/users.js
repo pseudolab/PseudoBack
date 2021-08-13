@@ -1,7 +1,10 @@
+require('dotenv').config();
 const Joi = require('joi');
 const db = require('./connection');
 const monk = require('monk');
 const _ = require('lodash');
+
+const DEFAULT_PROFILE_IMAGE_PATH = process.env.DEFAULT_PROFILE_IMAGE_PATH;
 
 const baseSchema = Joi.object({
     id: Joi.string().required(),
@@ -176,6 +179,8 @@ async function create(user) {
     // NOTE: 내장 '_id' 사용?
     const newId = await monk.id() + '';
     user.id = newId;
+
+    user.profileImageURL = user.profileImageURL || DEFAULT_PROFILE_IMAGE_PATH;
     
     const result = schema.validate(user);
     if (result.error == null) {
