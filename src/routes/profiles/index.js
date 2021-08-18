@@ -34,7 +34,7 @@ router.get('/my', requireLogin, async (req, res) => {
   res.json(myProfile);
 });
 
-router.put('/update', requireLogin, async (req, res) => {
+router.put('/my', requireLogin, async (req, res) => {
   const user = req.user;
   const profiles = req.body;
 
