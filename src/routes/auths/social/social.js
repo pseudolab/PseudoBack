@@ -1,7 +1,6 @@
 const { 
   verify
 } = require("../../../lib");
-require('dotenv').config()
 
 const verifyToken = async (req, res) => {
   try {

@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const http = require('http');
 const path = require('path');
 const jobs = require('@lib/job');
+const config = require('config');
 
 const app = express();
 
@@ -24,7 +25,10 @@ app.use(['/routes', '/api/routes'], routes)
 app.use('/static', express.static(path.join(__dirname, 'dist')))
 app.use('/image', express.static(path.join(__dirname, '../images')))
 
-app.set('port', process.env.PORT || 4000);
+app.set('port', 4000);
+if(config.has('PORT')) {
+    app.set('port', config.get('PORT'));
+}
 
 jobs.run();
 

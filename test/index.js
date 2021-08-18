@@ -1,15 +1,15 @@
 require('module-alias/register');
 
-require('dotenv').config();
 const chai = require('chai')
 const expect = require('chai').expect
-const port = 4000;  // TODO: use config
 const usersDB = require('@db/users');
 const _ = require('lodash');
+const config = require('config');
 
 chai.use(require('chai-http'))
 
-const USE_FAKE_LOGIN = process.env.USE_FAKE_LOGIN;
+const USE_FAKE_LOGIN = config.get('USE_FAKE_LOGIN')
+const port = config.get('PORT');
 
 // apply global header to all requests
 const header = {
@@ -66,30 +66,30 @@ describe('pseudo-back', ()=>{
         expect(google).to.have.property('userMail')
       })
 
-      const keys = _.get(fixture, 'new_user_profile');
+      // const keys = _.get(fixture, 'new_user_profile');
       
-      _.forEach(keys, (value, key)=>{
-        it(`should able to update a user ${key}`, async ()=>{
-          const response = await chai.request(server)
-            .put('/routes/profiles/update/' + key)
-            .send({ value })
-            .set(header)
+      // _.forEach(keys, (value, key)=>{
+      //   it(`should able to update a user ${key}`, async ()=>{
+      //     const response = await chai.request(server)
+      //       .put('/routes/profiles/update/' + key)
+      //       .send({ value })
+      //       .set(header)
           
-          expect(response).to.have.status(200)
-          expect(response.body).to.deep.equal({ res: 'success' })
-        })
+      //     expect(response).to.have.status(200)
+      //     expect(response.body).to.deep.equal({ res: 'success' })
+      //   })
 
-        it(`should return a user profile with updated ${key}`, async ()=>{
-          const response = await chai.request(server)
-            .get('/routes/profiles/my')
-            .set(header)
+      //   it(`should return a user profile with updated ${key}`, async ()=>{
+      //     const response = await chai.request(server)
+      //       .get('/routes/profiles/my')
+      //       .set(header)
           
-          const profile = response.body
+      //     const profile = response.body
           
-          expect(response).to.have.status(200)
-          expect(profile[key]).to.equal(value)
-        })
-      });
+      //     expect(response).to.have.status(200)
+      //     expect(profile[key]).to.equal(value)
+      //   })
+      // });
     })
 
     describe('qna api', ()=>{
@@ -99,7 +99,7 @@ describe('pseudo-back', ()=>{
           .send({
             subject: 'test',
             content: 'test content',
-            postID: 1,
+            postID: 123,
           })
           .set(header)
 

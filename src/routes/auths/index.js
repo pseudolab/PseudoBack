@@ -1,7 +1,6 @@
 const router=require('express').Router()
 // const socialRoutes=require('./social')
 const { requireLogin } = require('../../lib');
-require('dotenv').config()
 
 router.get('/login', 
   requireLogin,

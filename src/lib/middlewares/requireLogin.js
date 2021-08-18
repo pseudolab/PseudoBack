@@ -1,20 +1,19 @@
 // https://stackoverflow.com/questions/31063153/how-to-perform-login-redirect-with-nodejs-expressjs
 const social = require('../social');
 const users = require('@db/users');
-require('dotenv').config();
+const config = require('config');
+
+const USE_FAKE_LOGIN = config.get('USE_FAKE_LOGIN');
 
 async function requireLogin(req, res, next) {
-  if(process.env.NODE_ENV === 'development' && process.env.USE_FAKE_LOGIN) {
+  if(USE_FAKE_LOGIN) {
+    console.warn('USING FAKE LOGIN');
     const createdUser = await users.create({
       provider: 'google',
-      google: {
-        userID: 'fakeuserid',
-        userMail: 'fakeuser@pseudo.com',
-        userName: 'fakeuser-name',
-      }
+      google: config.get('FAKE_LOGIN_USER'),
       // photo: 'http://fakeuser.photo.url'
     })
-    
+
     req.user = createdUser;
     next();
     return;
