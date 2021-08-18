@@ -5,7 +5,7 @@ const counter = require('./counter');
  
 const schema = Joi.object().keys({
     userid: Joi.string().alphanum().required(),
-    username: Joi.string().alphanum().required(),
+    username: Joi.string().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
     keyword: Joi.array().items(Joi.string()).required(),
