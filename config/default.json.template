@@ -1,0 +1,21 @@
+{
+  "GOOGLE_APP_ID": "1867xxxxxxxxx-xxxxxxxxxxxxxxxxxx2g9t9s7avrn4kf.apps.googleusercontent.com",
+  "GOOGLE_APP_SECRET": "xxxxxxxxxxxxxxxxxxxxxNLw",
+  "SERSSION_SECRET": "xxxxxxxxxx",
+
+  "HOST": "localhost",
+  "PORT": 4000,
+  "TOKEN_SECRET": "xxxxxxxx",
+  "API_HOST": "xxxxxx",
+  
+  "USE_JOB": false,
+  "USE_FAKE_LOGIN": true,
+
+  "FAKE_LOGIN_USER": {
+    "userID": "fakeuseridhexvalue",
+    "userMail": "fakeuser@pseudo.com",
+    "userName": "fakeuser-name"
+  },
+
+  "DEFAULT_PROFILE_IMAGE_PATH": "http://cush.kr/_nuxt/img/test.3a7c59e.png"
+}

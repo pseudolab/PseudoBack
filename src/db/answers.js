@@ -5,12 +5,12 @@ const counter = require('./counter');
  
 const schema = Joi.object().keys({
     userid: Joi.string().alphanum().required(),
-    username: Joi.string().alphanum().required(),
+    username: Joi.string().required(),
     subject: Joi.string().required(),
     content: Joi.string().max(500).required(),
     postID: Joi.number().required(),
 });
- 
+
 const answers = db.get('answers');
  
 function get(id) {
@@ -19,15 +19,6 @@ function get(id) {
 
 async function create(answer) {
     if (!answer.username) answer.username = 'Anonymous';
-
-    // duplicate check
-    const existing = await get(answer.postID);
-    if (existing.length) {
-        throw {
-            created: false,
-            details: 'answer already exists',
-        };
-    }
 
     const result = schema.validate(answer);
     if (result.error == null) {

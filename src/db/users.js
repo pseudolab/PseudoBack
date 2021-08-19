@@ -1,10 +1,10 @@
-require('dotenv').config();
 const Joi = require('joi');
 const db = require('./connection');
 const monk = require('monk');
 const _ = require('lodash');
+const config = require('config');
 
-const DEFAULT_PROFILE_IMAGE_PATH = process.env.DEFAULT_PROFILE_IMAGE_PATH;
+const DEFAULT_PROFILE_IMAGE_PATH = config.get('DEFAULT_PROFILE_IMAGE_PATH');
 
 const baseSchema = Joi.object({
     id: Joi.string().required(),
