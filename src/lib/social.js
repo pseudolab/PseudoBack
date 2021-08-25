@@ -1,10 +1,8 @@
-require('dotenv').config()
+const config = require('config');
 
-const {
-  GOOGLE_APP_ID,
-} = process.env
+const GOOGLE_APP_ID = config.get('GOOGLE_APP_ID');
 
-const {OAuth2Client} = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(GOOGLE_APP_ID);
 
 /**

@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const db = require('@db/categories');
-const requireLogin = require('@lib').requireLogin;
-
+const { requireLogin } = require('@lib');
 
 router.get('/', (req, res) => {
   db.getAll().then((category) => {
@@ -25,7 +24,7 @@ router.get('/:categoryName',  requireLogin, async (req, res) => {
       res.json(error);
     });
   });
-}); 
+});
 
 router.post('/',  requireLogin, async (req, res) => {
   const userDB = require('@db/users');

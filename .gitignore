@@ -108,3 +108,9 @@ dist
 pseudo.code-workspace
 
 .DS_Store
+
+# ignore files on config, not entire folder
+config/**/*
+
+# allow example config
+!config/default.json.template

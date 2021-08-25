@@ -10,6 +10,7 @@ const replys = require('@db/replys');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const { requireLogin } = require('@lib');
 
 
 router.use(morgan('tiny'));
@@ -22,7 +23,7 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', requireLogin, (req, res) => {
     replys.create(req.body).then((reply) => {
         res.json(reply);
     }).catch((error) => {

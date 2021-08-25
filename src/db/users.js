@@ -2,6 +2,9 @@ const Joi = require('joi');
 const db = require('./connection');
 const monk = require('monk');
 const _ = require('lodash');
+const config = require('config');
+
+const DEFAULT_PROFILE_IMAGE_PATH = config.get('DEFAULT_PROFILE_IMAGE_PATH');
 
 const baseSchema = Joi.object({
     id: Joi.string().required(),
@@ -158,7 +161,7 @@ async function create(user) {
         }
 
         // merge if not null
-        _.mergeWith({}, user, {
+        _.mergeWith(user, {
             userName: user.google.userName,
             userMail: user.google.userMail,
             profileImageURL: user.google.photo,
@@ -176,6 +179,8 @@ async function create(user) {
     // NOTE: 내장 '_id' 사용?
     const newId = await monk.id() + '';
     user.id = newId;
+
+    user.profileImageURL = user.profileImageURL || DEFAULT_PROFILE_IMAGE_PATH;
     
     const result = schema.validate(user);
     if (result.error == null) {
@@ -191,25 +196,33 @@ async function create(user) {
     }
 }
 
-// update profile
-async function updateProfile(user, key, value) {
-    const exists = await findByEmail(user.userMail) || await findByUserName(user.userName);
-    if (!exists) {
+// use profileSchema
+async function updateProfiles(userid, profile) {
+    const user = await findById(userid);
+    if (!user) {
         throw new Error('User not found');
     }
 
-    user[key] = value;
-
-    const result = profileSchema.validate(user, {
-        allowUnknown: true
+    const result = profileSchema.validate(profile, {
+        presence: 'optional',
+        // prevent default value overwritting exist value
+        noDefaults: true,
+        // prevent unknown fields
+        stripUnknown: true
     });
 
     if (result.error == null) {
         const d = new Date();
-        user.updated = d;
+        profile.updated = d;
+
+        // merge if null in user
+        _.mergeWith(user, result.value, (a, b) => {
+            if (b === null) return a;
+            return b;
+        });
 
         return users.update({
-            id: user.id
+            id: userid
         }, {
             $set: user
         });
@@ -246,6 +259,6 @@ module.exports = {
     get,
     dropAll,
     updateStats,
-    updateProfile,
+    updateProfiles,
     updateProfileImageURL,
 };

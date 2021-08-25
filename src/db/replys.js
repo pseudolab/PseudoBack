@@ -3,7 +3,7 @@ const db = require('./connection');
 const fs = require('fs');
  
 const schema = Joi.object().keys({
-    username: Joi.string().alphanum().required(),
+    username: Joi.string().required(),
     content: Joi.string().max(500).required(),
     postID: Joi.number().required(),
 });

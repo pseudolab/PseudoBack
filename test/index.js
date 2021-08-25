@@ -1,15 +1,25 @@
 require('module-alias/register');
 
-require('dotenv').config();
 const chai = require('chai')
 const expect = require('chai').expect
-const port = 4000;  // TODO: use config
 const usersDB = require('@db/users');
 const _ = require('lodash');
+const config = require('config');
 
 chai.use(require('chai-http'))
 
-const USE_FAKE_LOGIN = process.env.USE_FAKE_LOGIN;
+const USE_FAKE_LOGIN = config.get('USE_FAKE_LOGIN')
+const port = config.get('PORT');
+
+// apply global header to all requests
+const header = {
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',
+  'X-Requested-With': 'XMLHttpRequest',
+}
+
+// chai with a custom header
+
 
 const fixture = {
   new_user_profile: {
@@ -43,6 +53,7 @@ describe('pseudo-back', ()=>{
       it('should return a user profile with google profile', async ()=>{
         const response = await chai.request(server)
           .get('/routes/profiles/my')
+          .set(header)
         
         expect(response).to.have.status(200)
 
@@ -55,28 +66,47 @@ describe('pseudo-back', ()=>{
         expect(google).to.have.property('userMail')
       })
 
-      const keys = _.get(fixture, 'new_user_profile');
-      
-      _.forEach(keys, (value, key)=>{
-        it(`should able to update a user ${key}`, async ()=>{
-          const response = await chai.request(server)
-            .put('/routes/profiles/update/' + key)
-            .send({ value })
-          
-          expect(response).to.have.status(200)
-          expect(response.body).to.deep.equal({ res: 'success' })
-        })
+      const new_profile = fixture.new_user_profile;
 
-        it(`should return a user profile with updated ${key}`, async ()=>{
-          const response = await chai.request(server)
-            .get('/routes/profiles/my')
-          
-          const profile = response.body
-          
-          expect(response).to.have.status(200)
-          expect(profile[key]).to.equal(value)
-        })
-      });
+      it(`should able to update my profile`, async ()=>{
+        const response = await chai.request(server)
+          .put('/routes/profiles/my/')
+          .send({ ...new_profile })
+          .set(header)
+        
+        expect(response).to.have.status(200)
+        expect(response.body).to.deep.equal({ res: 'success' })
+      })
+
+      it(`should return my profile with updated profile`, async ()=>{
+        const response = await chai.request(server)
+          .get('/routes/profiles/my')
+          .set(header)
+        
+        const profile = response.body
+        
+        expect(response).to.have.status(200)
+        expect(profile).to.include.keys(new_profile)
+      })
+    })
+
+    describe('qna api', ()=>{
+      it('should handle post answer', async ()=>{
+        const response = await chai.request(server)
+          .post('/routes/qnas/answers')
+          .send({
+            subject: 'test',
+            content: 'test content',
+            postID: 123,
+          })
+          .set(header)
+
+        // console.log(response.body)
+
+        // TODO: post db 초기화 추가
+        expect(response).to.have.status(200)
+        expect(response.body).to.have.property('created')
+      })
     })
   } else {
     // describe('users local old api', ()=>{

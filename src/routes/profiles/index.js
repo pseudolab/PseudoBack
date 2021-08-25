@@ -4,14 +4,13 @@ const users = require('@db/users');
 const requireLogin = require('@lib').requireLogin;
 const multer = require('multer');
 const path = require('path');
+const config = require('config');
 
 // 프로필 편집 기능 제공. 프로필 조회 기능은 유저 정보에 포함되므로 필요하지 않음
 
-require('dotenv').config();
-
 const ProfileImageBasePath = 'images';
-const Host = process.env.HOST || 'localhost';
-const Port = process.env.PORT || 4000;
+const Host = config.get('HOST') || 'localhost';
+const Port = config.get('PORT') || 4000;
 
 const multerConfig = {
   storage: multer.diskStorage({
@@ -32,14 +31,13 @@ router.get('/my', requireLogin, async (req, res) => {
   const myProfile = req.user;
 
   res.json(myProfile);
-}); 
+});
 
-router.put('/update/:key', requireLogin, async (req, res) => {
-  const { key } = req.params;
+router.put('/my', requireLogin, async (req, res) => {
   const user = req.user;
-  const value = req.body.value;
+  const profiles = req.body;
 
-  const result = await users.updateProfile(user, key, value);
+  const result = await users.updateProfiles(user.id, profiles);
   if (result.ok) {
     res.json({
       res: 'success'
