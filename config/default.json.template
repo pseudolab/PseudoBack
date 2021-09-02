@@ -2,6 +2,7 @@
   "GOOGLE_APP_ID": "1867xxxxxxxxx-xxxxxxxxxxxxxxxxxx2g9t9s7avrn4kf.apps.googleusercontent.com",
   "GOOGLE_APP_SECRET": "xxxxxxxxxxxxxxxxxxxxxNLw",
   "SERSSION_SECRET": "xxxxxxxxxx",
+  "MONGODB_URI": "mongodb://127.0.0.1:27017",
 
   "HOST": "localhost",
   "PORT": 4000,
