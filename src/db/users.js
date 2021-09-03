@@ -96,15 +96,15 @@ const localProfileSchema = Joi.object({
 const schemas = {
     google: baseSchema.concat(profileSchema).keys({
         google: googleProfileSchema,
-        stats: userStatsSchema
+        stats: userStatsSchema.default()
     }),
     local: baseSchema.concat(profileSchema).concat(localProfileSchema).keys({
-        stats: userStatsSchema
+        stats: userStatsSchema.default()
     })
 };
- 
+
 const users = db.get('users');
-    
+
 function getAll() {
     return users.find();
 }
